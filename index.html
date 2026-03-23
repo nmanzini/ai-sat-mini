@@ -428,25 +428,25 @@
           c.width = S; c.height = H;
           const ctx = c.getContext('2d');
 
-          const dotR = 12, lineW = 200, lineH = 3, textPad = 24;
+          const dotR = 8, lineW = 200, lineH = 2, textPad = 24;
           const dotX = isRight ? 64 : S - 64;
 
-          ctx.fillStyle = 'rgba(255,255,255,0.85)';
-          ctx.font = '500 48px "Helvetica Neue", Arial, sans-serif';
+          ctx.fillStyle = 'rgba(255,255,255,0.7)';
+          ctx.font = '400 36px "Helvetica Neue", Arial, sans-serif';
           ctx.textBaseline = 'middle';
-          ctx.shadowColor = 'rgba(0,0,0,0.8)';
-          ctx.shadowBlur = 10; ctx.shadowOffsetY = 4;
+          ctx.shadowColor = 'rgba(0,0,0,0.5)';
+          ctx.shadowBlur = 8; ctx.shadowOffsetY = 2;
 
           ctx.beginPath(); ctx.arc(dotX, H / 2, dotR, 0, Math.PI * 2); ctx.fill();
 
-          ctx.fillStyle = 'rgba(255,255,255,0.4)';
+          ctx.fillStyle = 'rgba(255,255,255,0.3)';
           if (isRight) {
             ctx.fillRect(dotX + dotR * 1.5, H / 2 - lineH / 2, lineW, lineH);
-            ctx.fillStyle = 'rgba(255,255,255,0.85)';
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
             ctx.fillText(text.toUpperCase(), dotX + dotR * 1.5 + lineW + textPad, H / 2);
           } else {
             ctx.fillRect(dotX - dotR * 1.5 - lineW, H / 2 - lineH / 2, lineW, lineH);
-            ctx.fillStyle = 'rgba(255,255,255,0.85)';
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
             const tw = ctx.measureText(text.toUpperCase()).width;
             ctx.fillText(text.toUpperCase(), dotX - dotR * 1.5 - lineW - textPad - tw, H / 2);
           }
@@ -460,7 +460,7 @@
           sprite.position.copy(pos);
 
           const aspect = S / H;
-          sprite.scale.set(0.012 * aspect, 0.012, 1);
+          sprite.scale.set(0.008 * aspect, 0.008, 1);
           sprite.renderOrder = 10; // overlay on top
 
           this.add(sprite);
