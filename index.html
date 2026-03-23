@@ -286,7 +286,7 @@
     let satAltitude = 1000;
     let satDistance = EARTH_RADIUS + satAltitude;
     const SUN_DIR = new THREE.Vector3(-1, 0, 0).normalize(); // perpendicular to polar orbit plane
-    const SUN_DIST = 50000;
+    const SUN_DIST = 500000;
 
     function orbitalVelocity(alt) { return Math.sqrt(GM / (EARTH_RADIUS + alt)); }
     function orbitalPeriod(alt) { const r = EARTH_RADIUS + alt; return 2 * Math.PI * r / orbitalVelocity(alt); }
@@ -379,7 +379,7 @@
           solarFront: new THREE.MeshStandardMaterial({
             map: this._solarTex, color: 0x555580,
             metalness: 0.35, roughness: 0.18,
-            emissive: new THREE.Color(0x0a0a28), emissiveIntensity: 2.5,
+            emissive: new THREE.Color(0x0a0a28), emissiveIntensity: 3.5,
           }),
           solarBack: new THREE.MeshStandardMaterial({
             color: 0x363636, metalness: 0.1, roughness: 0.9,
@@ -387,12 +387,12 @@
           }),
           bus: new THREE.MeshStandardMaterial({
             color: 0x444444, metalness: 0.6, roughness: 0.5,
-            emissive: new THREE.Color(0x181818), emissiveIntensity: 1.2,
+            emissive: new THREE.Color(0x181818), emissiveIntensity: 1.8,
           }),
           radiator: new THREE.MeshStandardMaterial({
             map: AISatMini._createRadiatorTexture(),
             color: 0xcccccc, metalness: 0.6, roughness: 0.35,
-            emissive: new THREE.Color(0x1a1512), emissiveIntensity: 0.8,
+            emissive: new THREE.Color(0x1a1512), emissiveIntensity: 1.3,
             side: THREE.DoubleSide,
           }),
         };
@@ -640,7 +640,7 @@
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.00005, 200000);
+    const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.00005, 2000000);
 
     // ── Post-processing: Bloom ───────────────────────────────
     const composer = new EffectComposer(renderer);
@@ -915,10 +915,10 @@
         scene.add(s); return s;
       };
 
-      addSprite(coronaTex, sunPos, 12000, 2);  // large outer corona
-      addSprite(glowTex,   sunPos, 6000,  2);  // mid glow
-      addSprite(coronaTex, sunPos, 2800,  3);  // bright inner disk
-      addSprite(coronaTex, sunPos, 900,   4);  // hot white core
+      addSprite(coronaTex, sunPos, 120000, 2);  // large outer corona
+      addSprite(glowTex,   sunPos, 60000,  2);  // mid glow
+      addSprite(coronaTex, sunPos, 28000,  3);  // bright inner disk
+      addSprite(coronaTex, sunPos, 9000,   4);  // hot white core
 
       // ── Lens flare ───────────────────────────────────────
       // Flare elements are placed along the line from sun through screen center
@@ -957,14 +957,14 @@
       }
 
       const flareElements = [
-        { t: 0.0,  scale: 2200, color:'rgba(255,255,220,1)',   shape:'circle' },
-        { t: 0.18, scale: 800,  color:'rgba(200,220,255,1)',   shape:'circle' },
-        { t: 0.32, scale: 1400, color:'rgba(255,200,100,1)',   shape:'ring'   },
-        { t: 0.50, scale: 600,  color:'rgba(180,200,255,1)',   shape:'circle' },
-        { t: 0.65, scale: 1000, color:'rgba(255,180,80,1)',    shape:'circle' },
-        { t: 0.80, scale: 500,  color:'rgba(200,220,255,1)',   shape:'ring'   },
-        { t: 1.0,  scale: 1600, color:'rgba(120,160,255,1)',   shape:'circle' },
-        { t: 0.25, scale: 3000, color:'rgba(255,245,200,1)',   shape:'streak' },
+        { t: 0.0,  scale: 22000, color:'rgba(255,255,220,1)',   shape:'circle' },
+        { t: 0.18, scale: 8000,  color:'rgba(200,220,255,1)',   shape:'circle' },
+        { t: 0.32, scale: 14000, color:'rgba(255,200,100,1)',   shape:'ring'   },
+        { t: 0.50, scale: 6000,  color:'rgba(180,200,255,1)',   shape:'circle' },
+        { t: 0.65, scale: 10000, color:'rgba(255,180,80,1)',    shape:'circle' },
+        { t: 0.80, scale: 5000,  color:'rgba(200,220,255,1)',   shape:'ring'   },
+        { t: 1.0,  scale: 16000, color:'rgba(120,160,255,1)',   shape:'circle' },
+        { t: 0.25, scale: 30000, color:'rgba(255,245,200,1)',   shape:'streak' },
       ];
 
       flareElements.forEach(({ t, scale, color, shape }) => {
