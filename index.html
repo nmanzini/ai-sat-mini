@@ -119,7 +119,7 @@
       static RAD_X = AISatMini.PANEL_DEPTH; // 12 m — full panel width
       static RAD_Y = 0.0005;                // 0.5 m thin
       static RAD_Z = 0.012;                 // 12 m deep each
-      static RAD_GAP = 0.003;               // 3 m between radiator panels
+      static RAD_GAP = 0.001;               // 1 m between radiator panels
 
       constructor() {
         super();
@@ -178,7 +178,7 @@
       _buildRadiators() {
         const { RAD_X, RAD_Y, RAD_Z, RAD_GAP, BUS_Z } = AISatMini;
         const geo = new THREE.BoxGeometry(RAD_X, RAD_Y, RAD_Z);
-        const zStart = -(BUS_Z / 2 + RAD_Z / 2 + 0.003);
+        const zStart = -(BUS_Z / 2 + RAD_Z / 2 + 0.001);
         for (let i = 0; i < 2; i++) {
           const panel = new THREE.Mesh(geo, this.materials.radiator);
           panel.position.z = zStart - i * (RAD_Z + RAD_GAP);
