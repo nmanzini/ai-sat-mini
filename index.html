@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,69 +8,206 @@
   <link rel="icon" href="data:,">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&display=swap"
+    rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
-    canvas { display: block; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+
+    canvas {
+      display: block;
+    }
+
     #loading {
-      position: fixed; inset: 0; z-index: 10;
-      display: flex; align-items: center; justify-content: center;
-      background: #000; color: #aaa;
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      color: #aaa;
       font-family: 'Helvetica Neue', Arial, sans-serif;
-      font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
+      font-size: 14px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
     }
+
     #info {
-      position: fixed; bottom: 16px; left: 16px; z-index: 5;
-      color: rgba(255,255,255,0.4); font-family: 'Helvetica Neue', Arial, sans-serif;
-      font-size: 11px; pointer-events: none; line-height: 1.6;
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      z-index: 5;
+      color: rgba(255, 255, 255, 0.4);
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 11px;
+      pointer-events: none;
+      line-height: 1.6;
     }
+
     #title {
-      position: fixed; top: 24px; right: 32px; z-index: 5;
-      pointer-events: none; text-align: right;
+      position: fixed;
+      top: 24px;
+      right: 32px;
+      z-index: 5;
+      pointer-events: none;
+      text-align: right;
       font-family: 'Playfair Display', 'Textile', Georgia, serif;
-      color: #fff; line-height: 0.95; text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+      color: #fff;
+      line-height: 0.95;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
     }
-    #title .its { font-size: 18px; font-style: italic; display: block; text-align: right; margin-bottom: 2px; }
-    #title .always { font-size: 42px; font-weight: bold; display: block; text-transform: uppercase; letter-spacing: 2px; }
-    #title .sunny { font-size: 42px; font-weight: bold; display: block; text-transform: uppercase; letter-spacing: 2px; }
-    #title .in { font-size: 18px; font-style: italic; display: inline; margin: 0 4px; }
-    #title .space { font-size: 42px; font-weight: bold; display: inline; text-transform: uppercase; letter-spacing: 2px; }
+
+    #title .its {
+      font-size: 18px;
+      font-style: italic;
+      display: block;
+      text-align: right;
+      margin-bottom: 2px;
+    }
+
+    #title .always {
+      font-size: 42px;
+      font-weight: bold;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    #title .sunny {
+      font-size: 42px;
+      font-weight: bold;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    #title .in {
+      font-size: 18px;
+      font-style: italic;
+      display: inline;
+      margin: 0 4px;
+    }
+
+    #title .space {
+      font-size: 42px;
+      font-weight: bold;
+      display: inline;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
     #controls-ui {
-      position: fixed; bottom: 16px; right: 24px; z-index: 5;
-      display: flex; flex-direction: column; gap: 6px; align-items: flex-end;
+      position: fixed;
+      bottom: 16px;
+      right: 24px;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: flex-end;
       font-family: 'Helvetica Neue', Arial, sans-serif;
       font-size: 11px;
     }
-    #controls-ui > div { display: flex; align-items: center; }
-    #controls-ui label {
-      color: rgba(255,255,255,0.3); margin-right: 8px;
-      font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+
+    #controls-ui>div {
+      display: flex;
+      align-items: center;
     }
+
+    #controls-ui label {
+      color: rgba(255, 255, 255, 0.3);
+      margin-right: 8px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
     #controls-ui button {
-      background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4);
-      border: 1px solid rgba(255,255,255,0.1);
-      padding: 5px 10px; cursor: pointer;
-      font-family: inherit; font-size: inherit;
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 5px 10px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: inherit;
       transition: all 0.2s;
     }
-    #controls-ui button:first-of-type { border-radius: 4px 0 0 4px; }
-    #controls-ui button:last-of-type { border-radius: 0 4px 4px 0; }
-    #controls-ui button:not(:first-of-type) { border-left: none; }
-    #controls-ui button:hover { background: rgba(255,255,255,0.12); }
-    #controls-ui button.active {
-      background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8);
-      border-color: rgba(255,255,255,0.25);
+
+    #controls-ui button:first-of-type {
+      border-radius: 4px 0 0 4px;
     }
+
+    #controls-ui button:last-of-type {
+      border-radius: 0 4px 4px 0;
+    }
+
+    #controls-ui button:not(:first-of-type) {
+      border-left: none;
+    }
+
+    #controls-ui button:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    #controls-ui button.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: rgba(255, 255, 255, 0.8);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
     @media (max-width: 600px) {
-      #title .its { font-size: 12px; }
-      #title .always, #title .sunny, #title .space { font-size: 24px; }
-      #title .in { font-size: 12px; }
-      #title { top: 12px; right: 16px; }
-      #info { font-size: 9px; bottom: 10px; left: 10px; }
-      #controls-ui { bottom: 10px; right: 10px; gap: 4px; font-size: 10px; }
-      #controls-ui button { padding: 4px 7px; }
-      #controls-ui label { font-size: 8px; margin-right: 5px; }
+      #title .its {
+        font-size: 12px;
+      }
+
+      #title .always,
+      #title .sunny,
+      #title .space {
+        font-size: 24px;
+      }
+
+      #title .in {
+        font-size: 12px;
+      }
+
+      #title {
+        top: 12px;
+        right: 16px;
+      }
+
+      #info {
+        font-size: 9px;
+        bottom: 10px;
+        left: 10px;
+      }
+
+      #controls-ui {
+        bottom: 10px;
+        right: 10px;
+        gap: 4px;
+        font-size: 10px;
+      }
+
+      #controls-ui button {
+        padding: 4px 7px;
+      }
+
+      #controls-ui label {
+        font-size: 8px;
+        margin-right: 5px;
+      }
     }
   </style>
   <script type="importmap">
@@ -81,6 +219,7 @@
   }
   </script>
 </head>
+
 <body>
   <div id="loading">Loading...</div>
   <div id="info">
@@ -125,7 +264,7 @@
     function orbitalVelocity(alt) { return Math.sqrt(GM / (EARTH_RADIUS + alt)); }
     function orbitalPeriod(alt) { const r = EARTH_RADIUS + alt; return 2 * Math.PI * r / orbitalVelocity(alt); }
 
-    // ── Atmosphere shader (needs logdepthbuf includes) ───────
+    // ── Atmosphere shader with Rayleigh-style scattering ─────
     const ATMOS_VS = `
       #include <common>
       #include <logdepthbuf_pars_vertex>
@@ -141,14 +280,36 @@
     const ATMOS_FS = `
       #include <common>
       #include <logdepthbuf_pars_fragment>
-      uniform vec3 uColor;
+      uniform vec3 uSunDir;
       uniform float uIntensity;
       varying vec3 vWorldNormal;
       varying vec3 vWorldPosition;
       void main() {
         vec3 viewDir = normalize(cameraPosition - vWorldPosition);
-        float fresnel = pow(max(1.0 - dot(vWorldNormal, viewDir), 0.0), 3.0);
-        gl_FragColor = vec4(uColor * fresnel * uIntensity, fresnel * 0.8);
+        vec3 normal = normalize(vWorldNormal);
+
+        // Fresnel rim
+        float fresnel = pow(max(1.0 - dot(normal, viewDir), 0.0), 3.0);
+
+        // Sun illumination — atmosphere only glows on sunlit side
+        float sunDot = dot(normal, uSunDir);
+        float sunMask = smoothstep(-0.15, 0.3, sunDot); // fade at terminator
+        float sunGlow = pow(max(sunDot, 0.0), 2.0) * 0.6;
+
+        // Rayleigh-style color: blue at edges, warm near sun
+        vec3 blueScatter = vec3(0.25, 0.55, 1.0);
+        vec3 warmScatter = vec3(1.0, 0.7, 0.4);
+        vec3 color = mix(blueScatter, warmScatter, sunGlow);
+
+        // Forward scattering (bright halo when looking toward sun through atmosphere)
+        float viewSunDot = max(dot(-viewDir, uSunDir), 0.0);
+        float forwardScatter = pow(viewSunDot, 8.0) * 0.5;
+
+        float lit = fresnel * sunMask + forwardScatter;
+        float alpha = lit * 0.85;
+        vec3 finalColor = color * lit * uIntensity;
+
+        gl_FragColor = vec4(finalColor, alpha);
         #include <logdepthbuf_fragment>
       }
     `;
@@ -161,10 +322,10 @@
       // Solar panels: perpendicular to sun (flat in X-Y)
       // Core + radiators: parallel to sun rays (flat in X-Z, thin in Y)
 
-      static PANEL_SPAN  = 0.085;   // 85 m each wing (170 m total)
+      static PANEL_SPAN = 0.085;   // 85 m each wing (170 m total)
       static PANEL_DEPTH = 0.012;   // 12 m
       static PANEL_THICK = 0.0003;  // 0.3 m
-      static PANEL_GAP   = 0.008;   // 8 m between panels
+      static PANEL_GAP = 0.008;   // 8 m between panels
 
       static BUS_X = AISatMini.PANEL_DEPTH / 2; // 6 m — half panel width
       static BUS_Y = 0.001;                      // 1 m thin
@@ -181,7 +342,6 @@
         this._buildSolarPanels();
         this._buildCore();
         this._buildRadiators();
-        this._buildFillLights();
       }
 
       _buildMaterials() {
@@ -257,8 +417,6 @@
         bar.position.z = lastRadCenter / 2;
         this.add(bar);
       }
-
-      _buildFillLights() { }
 
       static _createSolarTexture() {
         const S = 512;
@@ -455,9 +613,9 @@
       for (let i = 0; i < N; i++) {
         const θ = Math.random() * Math.PI * 2;
         const φ = Math.acos(2 * Math.random() - 1);
-        pos[i*3] = 90000 * Math.sin(φ) * Math.cos(θ);
-        pos[i*3+1] = 90000 * Math.sin(φ) * Math.sin(θ);
-        pos[i*3+2] = 90000 * Math.cos(φ);
+        pos[i * 3] = 90000 * Math.sin(φ) * Math.cos(θ);
+        pos[i * 3 + 1] = 90000 * Math.sin(φ) * Math.sin(θ);
+        pos[i * 3 + 2] = 90000 * Math.cos(φ);
       }
       const geo = new THREE.BufferGeometry();
       geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
@@ -473,11 +631,14 @@
     {
       // Surface
       const geo = new THREE.SphereGeometry(EARTH_RADIUS, 128, 64);
-      earthMesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
+      earthMesh = new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({
         map: loadTex('textures/earth_daymap.jpg'),
         emissiveMap: loadTex('textures/earth_nightmap.jpg'),
         emissive: new THREE.Color(1, 1, 1), emissiveIntensity: 0.6,
-        roughness: 0.85, metalness: 0.05,
+        roughness: 0.7, metalness: 0.05,
+        clearcoat: 0.1, clearcoatRoughness: 0.4,
+        sheen: 0.05, sheenRoughness: 0.8,
+        sheenColor: new THREE.Color(0.3, 0.5, 0.8),
       }));
       earthMesh.rotation.y = -1.2;
       earthGroup.add(earthMesh);
@@ -493,14 +654,14 @@
       cloudsMesh.rotation.y = 0.5;
       earthGroup.add(cloudsMesh);
 
-      // Atmosphere
+      // Outer atmosphere (Rayleigh scattering)
       const atmos = new THREE.Mesh(
-        new THREE.SphereGeometry(EARTH_RADIUS * 1.005, 64, 32),
+        new THREE.SphereGeometry(EARTH_RADIUS * 1.008, 64, 32),
         new THREE.ShaderMaterial({
           vertexShader: ATMOS_VS, fragmentShader: ATMOS_FS,
           uniforms: {
-            uColor: { value: new THREE.Color(0.3, 0.6, 1.0) },
-            uIntensity: { value: 1.2 },
+            uSunDir: { value: SUN_DIR.clone() },
+            uIntensity: { value: 1.4 },
           },
           side: THREE.BackSide, transparent: true,
           blending: THREE.AdditiveBlending, depthWrite: false,
@@ -508,6 +669,22 @@
       );
       atmos.renderOrder = 1;
       earthGroup.add(atmos);
+
+      // Inner atmosphere (tight rim glow)
+      const innerAtmos = new THREE.Mesh(
+        new THREE.SphereGeometry(EARTH_RADIUS * 1.003, 64, 32),
+        new THREE.ShaderMaterial({
+          vertexShader: ATMOS_VS, fragmentShader: ATMOS_FS,
+          uniforms: {
+            uSunDir: { value: SUN_DIR.clone() },
+            uIntensity: { value: 0.6 },
+          },
+          side: THREE.BackSide, transparent: true,
+          blending: THREE.AdditiveBlending, depthWrite: false,
+        })
+      );
+      innerAtmos.renderOrder = 1;
+      earthGroup.add(innerAtmos);
 
       scene.add(earthGroup);
     }
@@ -556,10 +733,14 @@
       color: 0x4488ff, transparent: true, opacity: 0.08,
       side: THREE.DoubleSide, depthWrite: false,
     });
-    let orbitRing = new THREE.Mesh(
-      new THREE.RingGeometry(satDistance - 2, satDistance + 2, 256, 1), orbitMat
-    );
-    orbitRing.lookAt(SUN_DIR.clone().multiplyScalar(1000));
+    function createOrbitRing() {
+      const ring = new THREE.Mesh(
+        new THREE.RingGeometry(satDistance - 2, satDistance + 2, 256, 1), orbitMat
+      );
+      ring.lookAt(SUN_DIR.clone().multiplyScalar(1000));
+      return ring;
+    }
+    let orbitRing = createOrbitRing();
     scene.add(orbitRing);
 
     // ── Satellite ────────────────────────────────────────────
@@ -586,10 +767,8 @@
       satellite.position.set(0, satDistance, 0);
       // Rebuild orbit ring
       scene.remove(orbitRing);
-      orbitRing = new THREE.Mesh(
-        new THREE.RingGeometry(satDistance - 2, satDistance + 2, 256, 1), orbitMat
-      );
-      orbitRing.lookAt(SUN_DIR.clone().multiplyScalar(1000));
+      orbitRing.geometry.dispose();
+      orbitRing = createOrbitRing();
       scene.add(orbitRing);
       // Update info
       const vel = orbitalVelocity(alt);
@@ -597,23 +776,18 @@
       document.getElementById('info-vel').textContent = vel.toFixed(2) + ' km/s';
     }
 
-    // Speed selector
-    document.querySelectorAll('#speed button').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelector('#speed .active').classList.remove('active');
-        btn.classList.add('active');
-        timeScale = Number(btn.dataset.speed);
+    function initButtonGroup(selector, dataAttr, callback) {
+      document.querySelectorAll(`${selector} button`).forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelector(`${selector} .active`).classList.remove('active');
+          btn.classList.add('active');
+          callback(Number(btn.dataset[dataAttr]));
+        });
       });
-    });
+    }
 
-    // Altitude selector
-    document.querySelectorAll('#altitude button').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelector('#altitude .active').classList.remove('active');
-        btn.classList.add('active');
-        setAltitude(Number(btn.dataset.alt));
-      });
-    });
+    initButtonGroup('#speed', 'speed', v => { timeScale = v; });
+    initButtonGroup('#altitude', 'alt', setAltitude);
 
     // ── Camera & Controls ────────────────────────────────────
     const satPos = new THREE.Vector3();
@@ -634,17 +808,21 @@
     // Expose for console debugging
     Object.assign(window, { camera, controls, satellite, scene, THREE });
 
-    // Logarithmic zoom: slow when close, fast when far
-    renderer.domElement.addEventListener('wheel', (e) => {
-      e.preventDefault();
+    function applyZoom(delta) {
       const dist = camera.position.distanceTo(controls.target);
       const factor = Math.max(dist * 0.16, 0.002);
       const dir = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
       const newDist = THREE.MathUtils.clamp(
-        dist + (e.deltaY > 0 ? factor : -factor),
+        dist + delta * factor,
         controls.minDistance, controls.maxDistance
       );
       camera.position.copy(controls.target).addScaledVector(dir, newDist);
+    }
+
+    // Logarithmic zoom: slow when close, fast when far
+    renderer.domElement.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      applyZoom(e.deltaY > 0 ? 1 : -1);
     }, { passive: false });
 
     // Pinch zoom on mobile (logarithmic, matching scroll zoom)
@@ -664,14 +842,7 @@
         const pinchDist = Math.sqrt(dx * dx + dy * dy);
         const delta = prevPinchDist - pinchDist;
         prevPinchDist = pinchDist;
-        const dist = camera.position.distanceTo(controls.target);
-        const factor = Math.max(dist * 0.006, 0.0005);
-        const dir = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
-        const newDist = THREE.MathUtils.clamp(
-          dist + delta * factor,
-          controls.minDistance, controls.maxDistance
-        );
-        camera.position.copy(controls.target).addScaledVector(dir, newDist);
+        applyZoom(delta * 0.0375);
       }
     }, { passive: false });
 
@@ -685,4 +856,5 @@
   <!-- 100% privacy-first analytics -->
   <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
 </body>
+
 </html>
