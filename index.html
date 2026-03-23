@@ -380,20 +380,20 @@
           solarFront: new THREE.MeshStandardMaterial({
             map: this._solarTex, color: 0x555580,
             metalness: 0.35, roughness: 0.18,
-            emissive: new THREE.Color(0x0a0a28), emissiveIntensity: 3.5,
+            emissive: new THREE.Color(0x1a1a50), emissiveIntensity: 5.0,
           }),
           solarBack: new THREE.MeshStandardMaterial({
             color: 0x363636, metalness: 0.1, roughness: 0.9,
-            emissive: new THREE.Color(0x080808), emissiveIntensity: 0.6,
+            emissive: new THREE.Color(0x1a1a1a), emissiveIntensity: 2.0,
           }),
           bus: new THREE.MeshStandardMaterial({
             color: 0x444444, metalness: 0.6, roughness: 0.5,
-            emissive: new THREE.Color(0x181818), emissiveIntensity: 1.8,
+            emissive: new THREE.Color(0x2a2a2a), emissiveIntensity: 3.5,
           }),
           radiator: new THREE.MeshStandardMaterial({
             map: AISatMini._createRadiatorTexture(),
             color: 0xcccccc, metalness: 0.6, roughness: 0.35,
-            emissive: new THREE.Color(0x1a1512), emissiveIntensity: 1.3,
+            emissive: new THREE.Color(0x2a2520), emissiveIntensity: 3.0,
             side: THREE.DoubleSide,
           }),
         };
@@ -877,8 +877,8 @@
       const sunPos = SUN_DIR.clone().multiplyScalar(SUN_DIST);
 
       scene.add(new THREE.DirectionalLight(0xfff5e0, 3.5).translateX(sunPos.x).translateY(sunPos.y).translateZ(sunPos.z));
-      scene.add(new THREE.AmbientLight(0xffffff, 0.04));
-      scene.add(new THREE.HemisphereLight(0x8899aa, 0x111111, 0.08));
+      scene.add(new THREE.AmbientLight(0xffffff, 0.12));
+      scene.add(new THREE.HemisphereLight(0x8899aa, 0x222222, 0.18));
 
       // ── Layered sun corona ────────────────────────────────
       function makeSunCanvas(size, stops) {
