@@ -771,8 +771,8 @@
       const sunPos = SUN_DIR.clone().multiplyScalar(SUN_DIST);
 
       scene.add(new THREE.DirectionalLight(0xfff5e0, 3.5).translateX(sunPos.x).translateY(sunPos.y).translateZ(sunPos.z));
-      scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-      scene.add(new THREE.HemisphereLight(0x8899aa, 0x333333, 0.2));
+      scene.add(new THREE.AmbientLight(0xffffff, 1.0));
+      scene.add(new THREE.HemisphereLight(0x8899aa, 0x333333, 0.5));
 
       // Sun glow
       const c = document.createElement('canvas');
