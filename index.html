@@ -119,7 +119,7 @@
     const GM = 398600.4418; // km³/s² — standard gravitational parameter
     let satAltitude = 1000;
     let satDistance = EARTH_RADIUS + satAltitude;
-    const SUN_DIR = new THREE.Vector3(-0.12, 0.01, -0.99).normalize();
+    const SUN_DIR = new THREE.Vector3(-1, 0, 0).normalize(); // perpendicular to polar orbit plane
     const SUN_DIST = 50000;
 
     function orbitalVelocity(alt) { return Math.sqrt(GM / (EARTH_RADIUS + alt)); }
@@ -188,19 +188,22 @@
         this._solarTex = AISatMini._createSolarTexture();
 
         this.materials = {
-          solar: new THREE.MeshStandardMaterial({
-            map: this._solarTex, color: 0x0d0d35,
-            metalness: 0.3, roughness: 0.15,
-            emissive: new THREE.Color(0x060618), emissiveIntensity: 0.7,
-            side: THREE.DoubleSide,
+          solarFront: new THREE.MeshStandardMaterial({
+            map: this._solarTex, color: 0x555580,
+            metalness: 0.35, roughness: 0.18,
+            emissive: new THREE.Color(0x060618), emissiveIntensity: 0.5,
+          }),
+          solarBack: new THREE.MeshStandardMaterial({
+            color: 0x040404, metalness: 0.05, roughness: 0.95,
           }),
           bus: new THREE.MeshStandardMaterial({
             color: 0x444444, metalness: 0.6, roughness: 0.5,
-            emissive: new THREE.Color(0x080808), emissiveIntensity: 0.15,
+            emissive: new THREE.Color(0x050505), emissiveIntensity: 0.05,
           }),
           radiator: new THREE.MeshStandardMaterial({
-            color: 0x888888, metalness: 0.4, roughness: 0.45,
-            emissive: new THREE.Color(0x080808), emissiveIntensity: 0.15,
+            map: AISatMini._createRadiatorTexture(),
+            color: 0xcccccc, metalness: 0.6, roughness: 0.35,
+            emissive: new THREE.Color(0x060606), emissiveIntensity: 0.06,
             side: THREE.DoubleSide,
           }),
         };
@@ -212,15 +215,23 @@
         const SECTION_GAP = 0.0003;
         const sectionSpan = (PANEL_SPAN - (SECTIONS - 1) * SECTION_GAP) / SECTIONS;
         const geo = new THREE.BoxGeometry(PANEL_DEPTH, sectionSpan, PANEL_THICK);
+        // BoxGeometry faces: +X, -X, +Y, -Y, +Z (front), -Z (back)
+        const { solarFront, solarBack } = this.materials;
+        const panelMats = [solarBack, solarBack, solarBack, solarBack, solarFront, solarBack];
         for (const sign of [-1, 1]) {
           const wingStart = sign * (PANEL_GAP / 2);
           for (let i = 0; i < SECTIONS; i++) {
-            const panel = new THREE.Mesh(geo, this.materials.solar);
+            const panel = new THREE.Mesh(geo, panelMats);
             const offset = sectionSpan / 2 + i * (sectionSpan + SECTION_GAP);
             panel.position.y = wingStart + sign * offset;
             this.add(panel);
           }
         }
+        // Connecting beam along Y spanning both wings
+        const totalSpan = 2 * (PANEL_SPAN + PANEL_GAP / 2);
+        const beamGeo = new THREE.BoxGeometry(0.0002, totalSpan, 0.00016);
+        const beam = new THREE.Mesh(beamGeo, this.materials.bus);
+        this.add(beam);
       }
 
       _buildCore() {
@@ -248,61 +259,136 @@
       }
 
       _buildFillLights() {
-        const a = new THREE.PointLight(0x8899bb, 0.4, 0.5);
+        const a = new THREE.PointLight(0x8899bb, 0.25, 0.5);
         a.position.set(-0.08, 0.06, -0.12);
         this.add(a);
-        const b = new THREE.PointLight(0x667799, 0.2, 0.5);
+        const b = new THREE.PointLight(0x667799, 0.1, 0.5);
         b.position.set(0.06, -0.04, 0.08);
         this.add(b);
       }
 
       static _createSolarTexture() {
+        const S = 512;
         const c = document.createElement('canvas');
-        c.width = 256; c.height = 256;
+        c.width = S; c.height = S;
         const ctx = c.getContext('2d');
-        // Base dark blue
-        ctx.fillStyle = '#0a0a2a';
-        ctx.fillRect(0, 0, 256, 256);
-        // Individual solar cells - 8x8 grid per tile
-        const cells = 8;
-        const cellW = 256 / cells;
-        const cellH = 256 / cells;
-        const cellPad = 1.5;
+
+        // Dark substrate (gaps between cells)
+        ctx.fillStyle = '#0a0a1a';
+        ctx.fillRect(0, 0, S, S);
+
+        const cells = 6;
+        const cellW = S / cells;
+        const cellH = S / cells;
+        const pad = 3.5;
+        const rad = 5;
+
         for (let r = 0; r < cells; r++) {
           for (let col = 0; col < cells; col++) {
-            const x = col * cellW + cellPad;
-            const y = r * cellH + cellPad;
-            const w = cellW - cellPad * 2;
-            const h = cellH - cellPad * 2;
-            // Slight color variation per cell
-            const v = Math.floor(Math.random() * 12);
-            ctx.fillStyle = `rgb(${14 + v}, ${14 + v}, ${48 + v})`;
-            ctx.fillRect(x, y, w, h);
-            // Cell bus bars (thin silver lines)
-            ctx.strokeStyle = 'rgba(140, 150, 180, 0.25)';
-            ctx.lineWidth = 0.5;
+            const x = col * cellW + pad;
+            const y = r * cellH + pad;
+            const w = cellW - pad * 2;
+            const h = cellH - pad * 2;
+
+            // Cell gradient — medium blue
+            const v = Math.random() * 10;
+            const grad = ctx.createLinearGradient(x, y, x + w * 0.3, y + h);
+            grad.addColorStop(0, `rgb(${22 + v}, ${26 + v}, ${80 + v})`);
+            grad.addColorStop(0.5, `rgb(${20 + v}, ${24 + v}, ${72 + v})`);
+            grad.addColorStop(1, `rgb(${16 + v}, ${20 + v}, ${65 + v})`);
+
+            ctx.beginPath();
+            ctx.roundRect(x, y, w, h, rad);
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // Subtle specular highlight
+            const hl = ctx.createRadialGradient(x + w * 0.35, y + h * 0.25, 0, x + w * 0.35, y + h * 0.25, w * 0.6);
+            hl.addColorStop(0, 'rgba(130, 150, 220, 0.1)');
+            hl.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.beginPath();
+            ctx.roundRect(x, y, w, h, rad);
+            ctx.fillStyle = hl;
+            ctx.fill();
+
+            // Central vertical bus bar (silver)
             const midX = x + w / 2;
-            ctx.beginPath(); ctx.moveTo(midX, y); ctx.lineTo(midX, y + h); ctx.stroke();
-            // Horizontal bus bars
-            ctx.strokeStyle = 'rgba(140, 150, 180, 0.12)';
-            for (let b = 1; b < 4; b++) {
-              const by = y + (h * b) / 4;
-              ctx.beginPath(); ctx.moveTo(x, by); ctx.lineTo(x + w, by); ctx.stroke();
+            ctx.strokeStyle = 'rgba(180, 190, 210, 0.35)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(midX, y + 3); ctx.lineTo(midX, y + h - 3); ctx.stroke();
+
+            // Horizontal finger electrodes
+            ctx.strokeStyle = 'rgba(180, 190, 210, 0.15)';
+            ctx.lineWidth = 0.6;
+            const fingers = 8;
+            for (let f = 1; f < fingers; f++) {
+              const fy = y + (h * f) / fingers;
+              ctx.beginPath(); ctx.moveTo(x + 4, fy); ctx.lineTo(x + w - 4, fy); ctx.stroke();
             }
           }
         }
-        // Thicker grid lines between cell groups (every 2 cells)
-        ctx.strokeStyle = 'rgba(30, 30, 60, 0.9)';
-        ctx.lineWidth = 2;
-        for (let i = 0; i <= 4; i++) {
-          const p = (i / 4) * 256;
-          ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, 256); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(256, p); ctx.stroke();
+
+        // Interconnect wiring between rows
+        ctx.strokeStyle = 'rgba(160, 170, 190, 0.3)';
+        ctx.lineWidth = 2.5;
+        for (let r = 1; r < cells; r++) {
+          const ly = r * cellH;
+          ctx.beginPath(); ctx.moveTo(0, ly); ctx.lineTo(S, ly); ctx.stroke();
         }
+
         const tex = new THREE.CanvasTexture(c);
         tex.colorSpace = THREE.SRGBColorSpace;
         tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-        tex.repeat.set(1, 4);
+        tex.repeat.set(1, 3);
+        return tex;
+      }
+
+      static _createRadiatorTexture() {
+        const S = 256;
+        const c = document.createElement('canvas');
+        c.width = S; c.height = S;
+        const ctx = c.getContext('2d');
+
+        // White/light grey base — radiators are white to radiate heat
+        ctx.fillStyle = '#c8c8cc';
+        ctx.fillRect(0, 0, S, S);
+
+        // Vertical heat pipe channels
+        const pipes = 12;
+        const pipeW = S / pipes;
+        for (let i = 0; i < pipes; i++) {
+          const x = i * pipeW;
+          // Pipe channel groove (darker stripe)
+          ctx.fillStyle = `rgba(0, 0, 0, ${0.06 + Math.random() * 0.04})`;
+          ctx.fillRect(x + pipeW * 0.1, 0, pipeW * 0.15, S);
+
+          // Pipe highlight (lighter stripe next to groove)
+          ctx.fillStyle = `rgba(255, 255, 255, ${0.08 + Math.random() * 0.04})`;
+          ctx.fillRect(x + pipeW * 0.3, 0, pipeW * 0.12, S);
+        }
+
+        // Horizontal panel seams
+        const seams = 4;
+        ctx.strokeStyle = 'rgba(60, 60, 70, 0.4)';
+        ctx.lineWidth = 1.5;
+        for (let i = 1; i < seams; i++) {
+          const y = (i / seams) * S;
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(S, y); ctx.stroke();
+        }
+
+        // Subtle edge darkening
+        const edgeGrad = ctx.createLinearGradient(0, 0, S, 0);
+        edgeGrad.addColorStop(0, 'rgba(0,0,0,0.06)');
+        edgeGrad.addColorStop(0.1, 'rgba(0,0,0,0)');
+        edgeGrad.addColorStop(0.9, 'rgba(0,0,0,0)');
+        edgeGrad.addColorStop(1, 'rgba(0,0,0,0.06)');
+        ctx.fillStyle = edgeGrad;
+        ctx.fillRect(0, 0, S, S);
+
+        const tex = new THREE.CanvasTexture(c);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+        tex.repeat.set(1, 2);
         return tex;
       }
     }
@@ -490,8 +576,8 @@
 
     const satellite = new AISatMini();
     satellite.position.set(0, satDistance, 0);
-    satellite.rotation.order = 'YZX';
-    satellite.rotation.y = Math.atan2(-SUN_DIR.x, -SUN_DIR.z);
+    // Orient: panels face sun (pivot's +Z), span tangent to orbit, radiator radial
+    satellite.rotation.order = 'ZYX';
     satellite.rotation.z = Math.PI / 2;
     orbitPivot.add(satellite);
 
@@ -559,7 +645,7 @@
     renderer.domElement.addEventListener('wheel', (e) => {
       e.preventDefault();
       const dist = camera.position.distanceTo(controls.target);
-      const factor = Math.max(dist * 0.08, 0.002);
+      const factor = Math.max(dist * 0.16, 0.002);
       const dir = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
       const newDist = THREE.MathUtils.clamp(
         dist + (e.deltaY > 0 ? factor : -factor),
@@ -586,7 +672,7 @@
         const delta = prevPinchDist - pinchDist;
         prevPinchDist = pinchDist;
         const dist = camera.position.distanceTo(controls.target);
-        const factor = Math.max(dist * 0.003, 0.0005);
+        const factor = Math.max(dist * 0.006, 0.0005);
         const dir = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
         const newDist = THREE.MathUtils.clamp(
           dist + delta * factor,
