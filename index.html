@@ -35,6 +35,42 @@
     #title .sunny { font-size: 42px; font-weight: bold; display: block; text-transform: uppercase; letter-spacing: 2px; }
     #title .in { font-size: 18px; font-style: italic; display: inline; margin: 0 4px; }
     #title .space { font-size: 42px; font-weight: bold; display: inline; text-transform: uppercase; letter-spacing: 2px; }
+    #controls-ui {
+      position: fixed; bottom: 16px; right: 24px; z-index: 5;
+      display: flex; flex-direction: column; gap: 6px; align-items: flex-end;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 11px;
+    }
+    #controls-ui > div { display: flex; align-items: center; }
+    #controls-ui label {
+      color: rgba(255,255,255,0.3); margin-right: 8px;
+      font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+    }
+    #controls-ui button {
+      background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 5px 10px; cursor: pointer;
+      font-family: inherit; font-size: inherit;
+      transition: all 0.2s;
+    }
+    #controls-ui button:first-of-type { border-radius: 4px 0 0 4px; }
+    #controls-ui button:last-of-type { border-radius: 0 4px 4px 0; }
+    #controls-ui button:not(:first-of-type) { border-left: none; }
+    #controls-ui button:hover { background: rgba(255,255,255,0.12); }
+    #controls-ui button.active {
+      background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8);
+      border-color: rgba(255,255,255,0.25);
+    }
+    @media (max-width: 600px) {
+      #title .its { font-size: 12px; }
+      #title .always, #title .sunny, #title .space { font-size: 24px; }
+      #title .in { font-size: 12px; }
+      #title { top: 12px; right: 16px; }
+      #info { font-size: 9px; bottom: 10px; left: 10px; }
+      #controls-ui { bottom: 10px; right: 10px; gap: 4px; font-size: 10px; }
+      #controls-ui button { padding: 4px 7px; }
+      #controls-ui label { font-size: 8px; margin-right: 5px; }
+    }
   </style>
   <script type="importmap">
   {
@@ -48,9 +84,23 @@
 <body>
   <div id="loading">Loading...</div>
   <div id="info">
-    AI Sat Mini &middot; 1000 km altitude &middot; Dawn-Dusk SSO<br>
+    AI Sat Mini &middot; Dawn-Dusk SSO<br>
     Drag to orbit &middot; Scroll to zoom<br>
-    20&times; real-time speed
+    <span id="info-alt">1000 km</span> &middot; <span id="info-vel">7.35 km/s</span>
+  </div>
+  <div id="controls-ui">
+    <div id="altitude">
+      <label>Altitude</label>
+      <button data-alt="500">500 km</button>
+      <button data-alt="1000" class="active">1000 km</button>
+      <button data-alt="2000">2000 km</button>
+    </div>
+    <div id="speed">
+      <label>Time</label>
+      <button data-speed="1">1&times;</button>
+      <button data-speed="10" class="active">10&times;</button>
+      <button data-speed="100">100&times;</button>
+    </div>
   </div>
   <div id="title">
     <span class="its">It's</span>
@@ -66,10 +116,14 @@
 
     // ── Constants (1 unit = 1 km) ────────────────────────────
     const EARTH_RADIUS = 6371;
-    const SAT_ALTITUDE = 1000;
-    const SAT_DISTANCE = EARTH_RADIUS + SAT_ALTITUDE;
+    const GM = 398600.4418; // km³/s² — standard gravitational parameter
+    let satAltitude = 1000;
+    let satDistance = EARTH_RADIUS + satAltitude;
     const SUN_DIR = new THREE.Vector3(-0.12, 0.01, -0.99).normalize();
     const SUN_DIST = 50000;
+
+    function orbitalVelocity(alt) { return Math.sqrt(GM / (EARTH_RADIUS + alt)); }
+    function orbitalPeriod(alt) { const r = EARTH_RADIUS + alt; return 2 * Math.PI * r / orbitalVelocity(alt); }
 
     // ── Atmosphere shader (needs logdepthbuf includes) ───────
     const ATMOS_VS = `
@@ -286,11 +340,11 @@
           const dt = clock.getDelta();
 
           // Earth rotation (around Y axis)
-          earthMesh.rotation.y += EARTH_ROT_SPEED * dt;
-          cloudsMesh.rotation.y += EARTH_ROT_SPEED * dt * 1.05; // clouds slightly faster
+          earthMesh.rotation.y += EARTH_BASE * timeScale * dt;
+          cloudsMesh.rotation.y += EARTH_BASE * timeScale * dt * 1.05;
 
           // Satellite orbit (rotate pivot around its local Z)
-          orbitPivot.rotation.z -= SAT_ORBIT_SPEED * dt;
+          orbitPivot.rotation.z -= satBase * timeScale * dt;
 
           // Fade orbit ring based on zoom distance
           const camDist = camera.position.distanceTo(controls.target);
@@ -419,36 +473,68 @@
     }
 
     // ── Orbit ring (faint) ────────────────────────────────────
-    const orbitGeo = new THREE.RingGeometry(SAT_DISTANCE - 2, SAT_DISTANCE + 2, 256, 1);
     const orbitMat = new THREE.MeshBasicMaterial({
       color: 0x4488ff, transparent: true, opacity: 0.08,
       side: THREE.DoubleSide, depthWrite: false,
     });
-    const orbitRing = new THREE.Mesh(orbitGeo, orbitMat);
+    let orbitRing = new THREE.Mesh(
+      new THREE.RingGeometry(satDistance - 2, satDistance + 2, 256, 1), orbitMat
+    );
     orbitRing.lookAt(SUN_DIR.clone().multiplyScalar(1000));
     scene.add(orbitRing);
 
     // ── Satellite ────────────────────────────────────────────
-    // Orbit pivot rotates the satellite in a polar plane perpendicular to sun
     const orbitPivot = new THREE.Group();
     scene.add(orbitPivot);
-    // Align pivot so rotation around its Z axis traces the orbit in the sun-facing plane
     orbitPivot.lookAt(SUN_DIR.clone().multiplyScalar(1000));
 
     const satellite = new AISatMini();
-    satellite.position.set(0, SAT_DISTANCE, 0);
-    // Rotate so panels face the sun, then 90° around sun-facing axis
+    satellite.position.set(0, satDistance, 0);
     satellite.rotation.order = 'YZX';
     satellite.rotation.y = Math.atan2(-SUN_DIR.x, -SUN_DIR.z);
     satellite.rotation.z = Math.PI / 2;
     orbitPivot.add(satellite);
 
     // ── Animation constants ─────────────────────────────────
-    const TIME_SCALE = 20; // 20x real speed
-    // Earth: 1 rotation per 86400s
-    const EARTH_ROT_SPEED = (2 * Math.PI / 86400) * TIME_SCALE;
-    // Satellite at 1000km altitude: orbital period ~105 min = 6300s
-    const SAT_ORBIT_SPEED = (2 * Math.PI / 6300) * TIME_SCALE;
+    let timeScale = 10;
+    const EARTH_BASE = 2 * Math.PI / 86400;
+    let satBase = 2 * Math.PI / orbitalPeriod(satAltitude);
+
+    function setAltitude(alt) {
+      satAltitude = alt;
+      satDistance = EARTH_RADIUS + alt;
+      satBase = 2 * Math.PI / orbitalPeriod(alt);
+      satellite.position.set(0, satDistance, 0);
+      // Rebuild orbit ring
+      scene.remove(orbitRing);
+      orbitRing = new THREE.Mesh(
+        new THREE.RingGeometry(satDistance - 2, satDistance + 2, 256, 1), orbitMat
+      );
+      orbitRing.lookAt(SUN_DIR.clone().multiplyScalar(1000));
+      scene.add(orbitRing);
+      // Update info
+      const vel = orbitalVelocity(alt);
+      document.getElementById('info-alt').textContent = alt + ' km';
+      document.getElementById('info-vel').textContent = vel.toFixed(2) + ' km/s';
+    }
+
+    // Speed selector
+    document.querySelectorAll('#speed button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelector('#speed .active').classList.remove('active');
+        btn.classList.add('active');
+        timeScale = Number(btn.dataset.speed);
+      });
+    });
+
+    // Altitude selector
+    document.querySelectorAll('#altitude button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelector('#altitude .active').classList.remove('active');
+        btn.classList.add('active');
+        setAltitude(Number(btn.dataset.alt));
+      });
+    });
 
     // ── Camera & Controls ────────────────────────────────────
     const satPos = new THREE.Vector3();
