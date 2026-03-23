@@ -230,12 +230,13 @@
       opacity: 0.045;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
+
     #vignette-overlay {
       position: fixed;
       inset: 0;
       z-index: 3;
       pointer-events: none;
-      background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.72) 100%);
+      background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.72) 100%);
     }
   </style>
 </head>
@@ -713,7 +714,7 @@
             const sx = _sunNDC.x, sy = _sunNDC.y;
             // Angle from sun to screen center
             const dx = _screenCenter.x - sx, dy = _screenCenter.y - sy;
-            const dist = Math.sqrt(dx*dx + dy*dy);
+            const dist = Math.sqrt(dx * dx + dy * dy);
             // Fade based on distance from screen center & whether sun is visible
             const flareFade = sunVisible ? THREE.MathUtils.clamp(1.0 - dist * 0.5, 0, 1) : 0;
 
@@ -769,9 +770,9 @@
         const θ = Math.random() * Math.PI * 2;
         const φ = Math.acos(2 * Math.random() - 1);
         const r = 90000;
-        pos1[i*3] = r*Math.sin(φ)*Math.cos(θ);
-        pos1[i*3+1] = r*Math.sin(φ)*Math.sin(θ);
-        pos1[i*3+2] = r*Math.cos(φ);
+        pos1[i * 3] = r * Math.sin(φ) * Math.cos(θ);
+        pos1[i * 3 + 1] = r * Math.sin(φ) * Math.sin(θ);
+        pos1[i * 3 + 2] = r * Math.cos(φ);
         sz1[i] = 6 + Math.random() * 14;
       }
       const geo1 = new THREE.BufferGeometry();
@@ -791,9 +792,9 @@
         const θ = Math.random() * Math.PI * 2;
         const φ = Math.acos(2 * Math.random() - 1);
         const r = 90000;
-        pos2[i*3] = r*Math.sin(φ)*Math.cos(θ);
-        pos2[i*3+1] = r*Math.sin(φ)*Math.sin(θ);
-        pos2[i*3+2] = r*Math.cos(φ);
+        pos2[i * 3] = r * Math.sin(φ) * Math.cos(θ);
+        pos2[i * 3 + 1] = r * Math.sin(φ) * Math.sin(θ);
+        pos2[i * 3 + 2] = r * Math.cos(φ);
       }
       const geo2 = new THREE.BufferGeometry();
       geo2.setAttribute('position', new THREE.BufferAttribute(pos2, 3));
@@ -884,26 +885,25 @@
         const c = document.createElement('canvas');
         c.width = c.height = size;
         const ctx = c.getContext('2d');
-        const g = ctx.createRadialGradient(size/2,size/2,0,size/2,size/2,size/2);
-        stops.forEach(([t,col]) => g.addColorStop(t, col));
+        const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+        stops.forEach(([t, col]) => g.addColorStop(t, col));
         ctx.fillStyle = g; ctx.fillRect(0, 0, size, size);
         return new THREE.CanvasTexture(c);
       }
 
       const coronaTex = makeSunCanvas(512, [
-        [0,   'rgba(255,255,255,1)'],
-        [0.04,'rgba(255,252,230,1)'],
-        [0.12,'rgba(255,240,180,0.85)'],
-        [0.3, 'rgba(255,200,100,0.35)'],
-        [0.55,'rgba(255,160,60,0.12)'],
-        [0.8, 'rgba(255,120,40,0.04)'],
-        [1,   'rgba(255,100,30,0)']
+        [0, 'rgba(255,255,255,1)'],
+        [0.12, 'rgba(255,255,255,1)'],
+        [0.2, 'rgba(255,255,240,0.9)'],
+        [0.35, 'rgba(255,248,220,0.6)'],
+        [0.6, 'rgba(255,200,100,0.2)'],
+        [1, 'rgba(255,100,30,0)']
       ]);
       const glowTex = makeSunCanvas(256, [
-        [0,   'rgba(255,245,200,0.9)'],
-        [0.2, 'rgba(255,220,140,0.5)'],
-        [0.5, 'rgba(255,180,80,0.15)'],
-        [1,   'rgba(255,140,50,0)']
+        [0, 'rgba(255,255,255,0.95)'],
+        [0.15, 'rgba(255,255,240,0.7)'],
+        [0.45, 'rgba(255,230,150,0.25)'],
+        [1, 'rgba(255,140,50,0)']
       ]);
 
       const addSprite = (tex, pos, scale, order) => {
@@ -915,14 +915,15 @@
         scene.add(s); return s;
       };
 
-      addSprite(coronaTex, sunPos, 120000, 2);  // large outer corona
-      addSprite(glowTex,   sunPos, 60000,  2);  // mid glow
-      addSprite(coronaTex, sunPos, 28000,  3);  // bright inner disk
-      addSprite(coronaTex, sunPos, 9000,   4);  // hot white core
+      addSprite(coronaTex, sunPos, 160000, 2);  // large outer corona
+      addSprite(glowTex, sunPos, 85000, 2);  // mid glow
+      addSprite(coronaTex, sunPos, 55000, 3);  // bright inner disk
+      addSprite(coronaTex, sunPos, 32000, 4);  // hot white core
+      addSprite(coronaTex, sunPos, 14000, 5);  // overexposed blinding centre
 
       // ── Lens flare ───────────────────────────────────────
       // Flare elements are placed along the line from sun through screen center
-      function makeFlareCanvas(size, color, shape='circle') {
+      function makeFlareCanvas(size, color, shape = 'circle') {
         const c = document.createElement('canvas');
         c.width = c.height = size;
         const ctx = c.getContext('2d');
@@ -931,7 +932,7 @@
           ctx.lineWidth = size * 0.05;
           ctx.globalAlpha = 0.6;
           ctx.beginPath();
-          ctx.arc(size/2, size/2, size*0.38, 0, Math.PI*2);
+          ctx.arc(size / 2, size / 2, size * 0.38, 0, Math.PI * 2);
           ctx.stroke();
         } else if (shape === 'streak') {
           // hexagonal "anamorphic" streak
@@ -940,31 +941,31 @@
           ctx.globalAlpha = 0.5;
           for (let i = 0; i < 6; i++) {
             const a = (i / 6) * Math.PI;
-            const x1 = size/2 + Math.cos(a) * size * 0.5;
-            const y1 = size/2 + Math.sin(a) * size * 0.5;
-            const x2 = size/2 - Math.cos(a) * size * 0.5;
-            const y2 = size/2 - Math.sin(a) * size * 0.5;
-            ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+            const x1 = size / 2 + Math.cos(a) * size * 0.5;
+            const y1 = size / 2 + Math.sin(a) * size * 0.5;
+            const x2 = size / 2 - Math.cos(a) * size * 0.5;
+            const y2 = size / 2 - Math.sin(a) * size * 0.5;
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
           }
         } else {
-          const g = ctx.createRadialGradient(size/2,size/2,0,size/2,size/2,size/2);
+          const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
           g.addColorStop(0, color);
           g.addColorStop(0.35, color.replace('1)', '0.5)'));
           g.addColorStop(1, color.replace('1)', '0)'));
-          ctx.fillStyle = g; ctx.fillRect(0,0,size,size);
+          ctx.fillStyle = g; ctx.fillRect(0, 0, size, size);
         }
         return new THREE.CanvasTexture(c);
       }
 
       const flareElements = [
-        { t: 0.0,  scale: 22000, color:'rgba(255,255,220,1)',   shape:'circle' },
-        { t: 0.18, scale: 8000,  color:'rgba(200,220,255,1)',   shape:'circle' },
-        { t: 0.32, scale: 14000, color:'rgba(255,200,100,1)',   shape:'ring'   },
-        { t: 0.50, scale: 6000,  color:'rgba(180,200,255,1)',   shape:'circle' },
-        { t: 0.65, scale: 10000, color:'rgba(255,180,80,1)',    shape:'circle' },
-        { t: 0.80, scale: 5000,  color:'rgba(200,220,255,1)',   shape:'ring'   },
-        { t: 1.0,  scale: 16000, color:'rgba(120,160,255,1)',   shape:'circle' },
-        { t: 0.25, scale: 30000, color:'rgba(255,245,200,1)',   shape:'streak' },
+        { t: 0.0, scale: 22000, color: 'rgba(255,255,220,1)', shape: 'circle' },
+        { t: 0.18, scale: 8000, color: 'rgba(200,220,255,1)', shape: 'circle' },
+        { t: 0.32, scale: 14000, color: 'rgba(255,200,100,1)', shape: 'ring' },
+        { t: 0.50, scale: 6000, color: 'rgba(180,200,255,1)', shape: 'circle' },
+        { t: 0.65, scale: 10000, color: 'rgba(255,180,80,1)', shape: 'circle' },
+        { t: 0.80, scale: 5000, color: 'rgba(200,220,255,1)', shape: 'ring' },
+        { t: 1.0, scale: 16000, color: 'rgba(120,160,255,1)', shape: 'circle' },
+        { t: 0.25, scale: 30000, color: 'rgba(255,245,200,1)', shape: 'streak' },
       ];
 
       flareElements.forEach(({ t, scale, color, shape }) => {
