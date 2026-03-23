@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>AI Sat Mini - Orbital Visualization</title>
   <link rel="icon" href="data:,">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -451,8 +451,9 @@
     const SAT_ORBIT_SPEED = (2 * Math.PI / 6300) * TIME_SCALE;
 
     // ── Camera & Controls ────────────────────────────────────
-    const satPos = new THREE.Vector3(SAT_DISTANCE, 0, 0);
-    camera.position.set(SAT_DISTANCE + 0.07, 0.02, 0.08);
+    const satPos = new THREE.Vector3();
+    satellite.getWorldPosition(satPos);
+    camera.position.set(satPos.x - 0.0185, satPos.y + 0.0741, satPos.z + 0.1174);
     camera.lookAt(satPos);
 
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -464,6 +465,9 @@
     controls.rotateSpeed = 0.5;
     controls.enableZoom = false;
     controls.update();
+
+    // Expose for console debugging
+    Object.assign(window, { camera, controls, satellite, THREE });
 
     // Logarithmic zoom: slow when close, fast when far
     renderer.domElement.addEventListener('wheel', (e) => {
@@ -489,6 +493,7 @@
     }, { passive: true });
     renderer.domElement.addEventListener('touchmove', (e) => {
       if (e.touches.length === 2) {
+        e.preventDefault();
         const dx = e.touches[0].clientX - e.touches[1].clientX;
         const dy = e.touches[0].clientY - e.touches[1].clientY;
         const pinchDist = Math.sqrt(dx * dx + dy * dy);
@@ -503,7 +508,7 @@
         );
         camera.position.copy(controls.target).addScaledVector(dir, newDist);
       }
-    }, { passive: true });
+    }, { passive: false });
 
     // ── Resize ───────────────────────────────────────────────
     addEventListener('resize', () => {
