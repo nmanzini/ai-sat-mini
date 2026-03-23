@@ -247,6 +247,7 @@
     <span class="sunny">Sunny</span>
     <span class="in">in</span><span class="space">Space</span>
   </div>
+
   <canvas id="c"></canvas>
 
   <script type="module">
@@ -342,6 +343,7 @@
         this._buildSolarPanels();
         this._buildCore();
         this._buildRadiators();
+        this._buildLabels();
       }
 
       _buildMaterials() {
@@ -416,6 +418,58 @@
         const bar = new THREE.Mesh(barGeo, this.materials.bus);
         bar.position.z = lastRadCenter / 2;
         this.add(bar);
+      }
+
+      _buildLabels() {
+        this.labels = [];
+        const createLabel = (text, pos, isRight) => {
+          const S = 1024; const H = 128;
+          const c = document.createElement('canvas');
+          c.width = S; c.height = H;
+          const ctx = c.getContext('2d');
+
+          const dotR = 12, lineW = 200, lineH = 3, textPad = 24;
+          const dotX = isRight ? 64 : S - 64;
+
+          ctx.fillStyle = 'rgba(255,255,255,0.85)';
+          ctx.font = '500 48px "Helvetica Neue", Arial, sans-serif';
+          ctx.textBaseline = 'middle';
+          ctx.shadowColor = 'rgba(0,0,0,0.8)';
+          ctx.shadowBlur = 10; ctx.shadowOffsetY = 4;
+
+          ctx.beginPath(); ctx.arc(dotX, H / 2, dotR, 0, Math.PI * 2); ctx.fill();
+
+          ctx.fillStyle = 'rgba(255,255,255,0.4)';
+          if (isRight) {
+            ctx.fillRect(dotX + dotR * 1.5, H / 2 - lineH / 2, lineW, lineH);
+            ctx.fillStyle = 'rgba(255,255,255,0.85)';
+            ctx.fillText(text.toUpperCase(), dotX + dotR * 1.5 + lineW + textPad, H / 2);
+          } else {
+            ctx.fillRect(dotX - dotR * 1.5 - lineW, H / 2 - lineH / 2, lineW, lineH);
+            ctx.fillStyle = 'rgba(255,255,255,0.85)';
+            const tw = ctx.measureText(text.toUpperCase()).width;
+            ctx.fillText(text.toUpperCase(), dotX - dotR * 1.5 - lineW - textPad - tw, H / 2);
+          }
+
+          const tex = new THREE.CanvasTexture(c);
+          tex.colorSpace = THREE.SRGBColorSpace;
+          tex.minFilter = THREE.LinearFilter;
+          const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0, depthTest: false });
+          const sprite = new THREE.Sprite(mat);
+          sprite.center.set(dotX / S, 0.5);
+          sprite.position.copy(pos);
+
+          const aspect = S / H;
+          sprite.scale.set(0.012 * aspect, 0.012, 1);
+          sprite.renderOrder = 10; // overlay on top
+
+          this.add(sprite);
+          this.labels.push(sprite);
+        };
+
+        createLabel('Solar Array', new THREE.Vector3(0, 0.045, 0), true);
+        createLabel('Compute Core', new THREE.Vector3(0.005, 0, 0.005), false);
+        createLabel('Radiators', new THREE.Vector3(0, 0, -0.015), true);
       }
 
       static _createSolarTexture() {
@@ -571,6 +625,9 @@
       renderer.render(scene, camera);
       setTimeout(() => {
         document.getElementById('loading').style.display = 'none';
+
+
+
         const clock = new THREE.Clock();
         (function animate() {
           requestAnimationFrame(animate);
@@ -595,6 +652,26 @@
           camera.position.add(delta);
 
           controls.update();
+
+          // Update Labels
+          const fadeStart = 0.16;
+          const fadeFull = 0.22;
+          const fadeOutStart = 0.8;
+          const fadeOutEnd = 1.5;
+
+          let labelOpacity = 0;
+          if (camDist > fadeStart && camDist < fadeOutEnd) {
+            if (camDist < fadeFull) {
+              labelOpacity = (camDist - fadeStart) / (fadeFull - fadeStart);
+            } else if (camDist > fadeOutStart) {
+              labelOpacity = 1.0 - (camDist - fadeOutStart) / (fadeOutEnd - fadeOutStart);
+            } else {
+              labelOpacity = 1.0;
+            }
+          }
+
+          satellite.labels.forEach(s => { s.material.opacity = labelOpacity; });
+
           renderer.render(scene, camera);
         })();
       }, 100);
