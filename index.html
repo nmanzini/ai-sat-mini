@@ -49,7 +49,8 @@
   <div id="loading">Loading...</div>
   <div id="info">
     AI Sat Mini &middot; 1000 km altitude &middot; Dawn-Dusk SSO<br>
-    Drag to orbit &middot; Scroll to zoom
+    Drag to orbit &middot; Scroll to zoom<br>
+    20&times; real-time speed
   </div>
   <div id="title">
     <span class="its">It's</span>
@@ -279,8 +280,29 @@
       renderer.render(scene, camera);
       setTimeout(() => {
         document.getElementById('loading').style.display = 'none';
+        const clock = new THREE.Clock();
         (function animate() {
           requestAnimationFrame(animate);
+          const dt = clock.getDelta();
+
+          // Earth rotation (around Y axis)
+          earthMesh.rotation.y += EARTH_ROT_SPEED * dt;
+          cloudsMesh.rotation.y += EARTH_ROT_SPEED * dt * 1.05; // clouds slightly faster
+
+          // Satellite orbit (rotate pivot around its local Z)
+          orbitPivot.rotation.z -= SAT_ORBIT_SPEED * dt;
+
+          // Fade orbit ring based on zoom distance
+          const camDist = camera.position.distanceTo(controls.target);
+          orbitMat.opacity = THREE.MathUtils.clamp((camDist - 5) / 500, 0, 0.08);
+
+          // Move camera to follow satellite
+          const prevTarget = controls.target.clone();
+          satellite.getWorldPosition(satPos);
+          const delta = satPos.clone().sub(prevTarget);
+          controls.target.copy(satPos);
+          camera.position.add(delta);
+
           controls.update();
           renderer.render(scene, camera);
         })();
@@ -313,30 +335,30 @@
     }
 
     // ── Earth ────────────────────────────────────────────────
+    const earthGroup = new THREE.Group();
+    let earthMesh, cloudsMesh;
     {
-      const earth = new THREE.Group();
-
       // Surface
       const geo = new THREE.SphereGeometry(EARTH_RADIUS, 128, 64);
-      const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
+      earthMesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
         map: loadTex('textures/earth_daymap.jpg'),
         emissiveMap: loadTex('textures/earth_nightmap.jpg'),
         emissive: new THREE.Color(1, 1, 1), emissiveIntensity: 0.6,
         roughness: 0.85, metalness: 0.05,
       }));
-      mesh.rotation.y = -1.2;
-      earth.add(mesh);
+      earthMesh.rotation.y = -1.2;
+      earthGroup.add(earthMesh);
 
       // Clouds
-      const clouds = new THREE.Mesh(
+      cloudsMesh = new THREE.Mesh(
         new THREE.SphereGeometry(EARTH_RADIUS * 1.001, 96, 48),
         new THREE.MeshStandardMaterial({
           map: loadTex('textures/earth_clouds.jpg'),
           transparent: true, opacity: 0.35, depthWrite: false, side: THREE.DoubleSide,
         })
       );
-      clouds.rotation.y = 0.5;
-      earth.add(clouds);
+      cloudsMesh.rotation.y = 0.5;
+      earthGroup.add(cloudsMesh);
 
       // Atmosphere
       const atmos = new THREE.Mesh(
@@ -352,9 +374,9 @@
         })
       );
       atmos.renderOrder = 1;
-      earth.add(atmos);
+      earthGroup.add(atmos);
 
-      scene.add(earth);
+      scene.add(earthGroup);
     }
 
     // ── Sun & Lighting ───────────────────────────────────────
@@ -396,12 +418,35 @@
       scene.add(core);
     }
 
+    // ── Orbit ring (faint) ────────────────────────────────────
+    const orbitGeo = new THREE.RingGeometry(SAT_DISTANCE - 2, SAT_DISTANCE + 2, 256, 1);
+    const orbitMat = new THREE.MeshBasicMaterial({
+      color: 0x4488ff, transparent: true, opacity: 0.08,
+      side: THREE.DoubleSide, depthWrite: false,
+    });
+    const orbitRing = new THREE.Mesh(orbitGeo, orbitMat);
+    orbitRing.lookAt(SUN_DIR.clone().multiplyScalar(1000));
+    scene.add(orbitRing);
+
     // ── Satellite ────────────────────────────────────────────
+    // Orbit pivot rotates the satellite in a polar plane perpendicular to sun
+    const orbitPivot = new THREE.Group();
+    scene.add(orbitPivot);
+    // Align pivot so rotation around its Z axis traces the orbit in the sun-facing plane
+    orbitPivot.lookAt(SUN_DIR.clone().multiplyScalar(1000));
+
     const satellite = new AISatMini();
     satellite.position.set(SAT_DISTANCE, 0, 0);
-    // Rotate around solar panel axis (Y) so panels face the sun
+    // Rotate so panels face the sun
     satellite.rotation.y = Math.atan2(-SUN_DIR.x, -SUN_DIR.z);
-    scene.add(satellite);
+    orbitPivot.add(satellite);
+
+    // ── Animation constants ─────────────────────────────────
+    const TIME_SCALE = 20; // 20x real speed
+    // Earth: 1 rotation per 86400s
+    const EARTH_ROT_SPEED = (2 * Math.PI / 86400) * TIME_SCALE;
+    // Satellite at 1000km altitude: orbital period ~105 min = 6300s
+    const SAT_ORBIT_SPEED = (2 * Math.PI / 6300) * TIME_SCALE;
 
     // ── Camera & Controls ────────────────────────────────────
     const satPos = new THREE.Vector3(SAT_DISTANCE, 0, 0);
