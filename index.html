@@ -4,223 +4,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AI Sat Mini - Orbital Visualization</title>
+  <title>AI Sat Mini — Scroll Experience</title>
   <link rel="icon" href="data:,">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&display=swap"
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
     rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
 
-    html,
-    body {
+  <style>
+    /* ── Reset ─────────────────────────────────────────────── */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
       width: 100%;
       height: 100%;
-      overflow: hidden;
       background: #000;
-    }
-
-    canvas {
-      display: block;
-    }
-
-    #loading {
-      position: fixed;
-      inset: 0;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #000;
-      color: #aaa;
-      font-family: 'Helvetica Neue', Arial, sans-serif;
-      font-size: 14px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    #info {
-      position: fixed;
-      bottom: 16px;
-      left: 16px;
-      z-index: 5;
-      color: rgba(255, 255, 255, 0.4);
-      font-family: 'Helvetica Neue', Arial, sans-serif;
-      font-size: 11px;
-      pointer-events: none;
-      line-height: 1.6;
-    }
-
-    #title {
-      position: fixed;
-      top: 24px;
-      right: 32px;
-      z-index: 5;
-      pointer-events: none;
-      text-align: right;
-      font-family: 'Playfair Display', 'Textile', Georgia, serif;
       color: #fff;
-      line-height: 0.95;
-      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
-    }
-
-    #title .its {
-      font-size: 18px;
-      font-style: italic;
-      display: block;
-      text-align: right;
-      margin-bottom: 2px;
-    }
-
-    #title .always {
-      font-size: 42px;
-      font-weight: bold;
-      display: block;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-
-    #title .sunny {
-      font-size: 42px;
-      font-weight: bold;
-      display: block;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-
-    #title .in {
-      font-size: 18px;
-      font-style: italic;
-      display: inline;
-      margin: 0 4px;
-    }
-
-    #title .space {
-      font-size: 42px;
-      font-weight: bold;
-      display: inline;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-
-    #controls-ui {
-      position: fixed;
-      bottom: 16px;
-      right: 24px;
-      z-index: 5;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      align-items: flex-end;
       font-family: 'Helvetica Neue', Arial, sans-serif;
-      font-size: 11px;
+      overflow: hidden;
     }
 
-    #controls-ui>div {
-      display: flex;
-      align-items: center;
+    /* ── Fixed canvas ──────────────────────────────────────── */
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      display: block;
     }
 
-    #controls-ui label {
-      color: rgba(255, 255, 255, 0.3);
-      margin-right: 8px;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    #controls-ui button {
-      background: rgba(255, 255, 255, 0.06);
-      color: rgba(255, 255, 255, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 5px 10px;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: inherit;
-      transition: all 0.2s;
-    }
-
-    #controls-ui button:first-of-type {
-      border-radius: 4px 0 0 4px;
-    }
-
-    #controls-ui button:last-of-type {
-      border-radius: 0 4px 4px 0;
-    }
-
-    #controls-ui button:not(:first-of-type) {
-      border-left: none;
-    }
-
-    #controls-ui button:hover {
-      background: rgba(255, 255, 255, 0.12);
-    }
-
-    #controls-ui button.active {
-      background: rgba(255, 255, 255, 0.15);
-      color: rgba(255, 255, 255, 0.8);
-      border-color: rgba(255, 255, 255, 0.25);
-    }
-
-    @media (max-width: 600px) {
-      #title .its {
-        font-size: 12px;
-      }
-
-      #title .always,
-      #title .sunny,
-      #title .space {
-        font-size: 24px;
-      }
-
-      #title .in {
-        font-size: 12px;
-      }
-
-      #title {
-        top: 12px;
-        right: 16px;
-      }
-
-      #info {
-        font-size: 9px;
-        bottom: 10px;
-        left: 10px;
-      }
-
-      #controls-ui {
-        bottom: 10px;
-        right: 10px;
-        gap: 4px;
-        font-size: 10px;
-      }
-
-      #controls-ui button {
-        padding: 4px 7px;
-      }
-
-      #controls-ui label {
-        font-size: 8px;
-        margin-right: 5px;
-      }
-    }
-  </style>
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://esm.sh/three@0.160.0",
-      "three/addons/": "https://esm.sh/three@0.160.0/examples/jsm/"
-    }
-  }
-  </script>
-
-  <!-- Film grain + vignette overlay -->
-  <style>
+    /* ── Overlays ──────────────────────────────────────────── */
     #grain-overlay {
       position: fixed;
       inset: 0;
@@ -238,32 +53,376 @@
       pointer-events: none;
       background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.72) 100%);
     }
+
+    /* ── Loading ───────────────────────────────────────────── */
+    #loading {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      color: #aaa;
+      font-size: 14px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: opacity 0.8s ease;
+    }
+    #loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ── Progress bar ──────────────────────────────────────── */
+    #progress-bar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 2px;
+      height: 0%;
+      background: rgba(255, 255, 255, 0.25);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* ── Fixed title (top-right, like original) ──────────── */
+    #title {
+      position: fixed;
+      top: 24px;
+      right: 32px;
+      z-index: 5;
+      pointer-events: none;
+      text-align: right;
+      font-family: 'Playfair Display', Georgia, serif;
+      color: #fff;
+      line-height: 0.95;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+    #title.visible { opacity: 1; }
+    #title .its { font-size: 18px; font-style: italic; display: block; margin-bottom: 2px; }
+    #title .always,
+    #title .sunny { font-size: 42px; font-weight: bold; display: block; text-transform: uppercase; letter-spacing: 2px; }
+    #title .in { font-size: 18px; font-style: italic; display: inline; margin: 0 4px; }
+    #title .space { font-size: 42px; font-weight: bold; display: inline; text-transform: uppercase; letter-spacing: 2px; }
+
+    /* ── Slide sections (all stacked, fixed) ─────────────── */
+    .scroll-section {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .section-inner {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding: 0 8vw;
+    }
+
+    /* Alternating alignment */
+    .section-inner.left { justify-content: flex-start; }
+    .section-inner.right { justify-content: flex-end; }
+    .section-inner.center {
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* ── Slide dots + arrows (navigation) ────────────────── */
+    #slide-dots {
+      position: fixed;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      pointer-events: auto;
+    }
+    .slide-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: all 0.4s ease;
+    }
+    .slide-dot.active {
+      background: rgba(255, 255, 255, 0.8);
+      border-color: rgba(255, 255, 255, 0.9);
+      transform: scale(1.3);
+    }
+    .dot-arrow {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.2);
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .dot-arrow:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.7);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .dot-arrow:active { transform: scale(0.9); }
+    .dot-arrow.disabled { opacity: 0.15; pointer-events: none; }
+
+    /* ── Section content cards ─────────────────────────────── */
+    .section-content {
+      max-width: 460px;
+      padding: 36px 40px;
+      background: rgba(0, 0, 0, 0.18);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 6px;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.9s ease-out, transform 0.9s ease-out;
+      pointer-events: none;
+      user-select: none;
+    }
+    .section-content.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Hero + finale: no card background */
+    .section-content.transparent {
+      background: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border: none;
+      max-width: 640px;
+    }
+
+    /* ── Typography ────────────────────────────────────────── */
+    .section-label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.35);
+      margin-bottom: 16px;
+    }
+
+    .section-content h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 64px;
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: 1px;
+      text-shadow: 0 4px 40px rgba(0, 0, 0, 0.9);
+      margin-bottom: 20px;
+    }
+
+    .section-content h1 .italic {
+      font-style: italic;
+      font-weight: 400;
+      font-size: 0.45em;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .section-content h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 42px;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.8);
+    }
+
+    .section-content p {
+      font-size: 15px;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.65);
+      text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+    }
+
+    /* ── Nav arrows ──────────────────────────────────────── */
+    #nav-arrows {
+      display: none; /* replaced by integrated dot arrows */
+    }
+    .nav-arrow {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-arrow:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.7);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .nav-arrow:active {
+      transform: scale(0.9);
+    }
+    .nav-arrow.disabled {
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
+    /* ── Explore link ─────────────────────────────────────── */
+    .explore-link {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 14px 32px;
+      font-size: 14px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      transition: all 0.3s ease;
+      pointer-events: auto;
+    }
+    .explore-link:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* ── Hero title (matches top-right format, larger) ────── */
+    .section-inner.hero-align {
+      justify-content: flex-end;
+      align-items: center;
+      padding-right: 8vw;
+    }
+    .hero-title {
+      text-align: right;
+      font-family: 'Playfair Display', Georgia, serif;
+      line-height: 0.95;
+      text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.8);
+    }
+    .hero-title .its { font-size: 28px; font-style: italic; display: block; margin-bottom: 4px; font-weight: 400; }
+    .hero-title .always,
+    .hero-title .sunny { font-size: 72px; font-weight: bold; display: block; text-transform: uppercase; letter-spacing: 3px; }
+    .hero-title .in { font-size: 28px; font-style: italic; display: inline; margin: 0 6px; font-weight: 400; }
+    .hero-title .space { font-size: 72px; font-weight: bold; display: inline; text-transform: uppercase; letter-spacing: 3px; }
+    .hero-title p { margin-top: 20px; text-align: right; }
+
+    /* ── Scroll hint ───────────────────────────────────────── */
+    .scroll-hint {
+      margin-top: 40px;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.3);
+      animation: hint-bounce 2.5s ease-in-out infinite;
+    }
+    @keyframes hint-bounce {
+      0%, 100% { transform: translateY(0); opacity: 0.3; }
+      50% { transform: translateY(8px); opacity: 0.6; }
+    }
+
+    /* ── Responsive ────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      /* All sections: cards at bottom, 3D visible above */
+      .section-inner {
+        padding: 0 5vw 24px 5vw;
+        padding-right: 40px; /* clear dots */
+        align-items: flex-end;
+      }
+      .section-inner.left,
+      .section-inner.right {
+        justify-content: flex-start;
+      }
+
+      /* Cards: compact at bottom */
+      .section-content {
+        max-width: 100%;
+        padding: 16px 20px;
+      }
+      .section-content.transparent {
+        max-width: 100%;
+      }
+
+      /* Hero: centered on mobile */
+      .section-inner.hero-align {
+        justify-content: center;
+        align-items: center;
+        padding-bottom: 0;
+        padding-right: 5vw;
+      }
+      .hero-title { text-align: center; }
+      .hero-title p { text-align: center; }
+      .hero-title .always, .hero-title .sunny, .hero-title .space { font-size: 38px; letter-spacing: 2px; }
+      .hero-title .its, .hero-title .in { font-size: 14px; }
+
+      /* Finale: centered */
+      .section-inner.center {
+        justify-content: center;
+        align-items: center;
+        padding-bottom: 0;
+        padding-right: 5vw;
+      }
+      .section-content h2 { font-size: 26px; }
+      .section-content p { font-size: 13px; line-height: 1.6; }
+      .section-label { font-size: 9px; letter-spacing: 2px; margin-bottom: 10px; }
+
+      /* Fixed title */
+      #title { top: 10px; right: 14px; }
+      #title .always, #title .sunny, #title .space { font-size: 20px; letter-spacing: 1px; }
+      #title .its, #title .in { font-size: 10px; }
+
+      /* Dots + arrows */
+      #slide-dots { right: 10px; gap: 7px; }
+      .slide-dot { width: 6px; height: 6px; }
+      .dot-arrow { width: 24px; height: 24px; font-size: 8px; }
+
+      /* Explore link */
+      .explore-link { padding: 12px 24px; font-size: 12px; }
+
+      /* Scroll hint */
+      .scroll-hint { font-size: 10px; margin-top: 28px; }
+    }
   </style>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://esm.sh/three@0.160.0",
+      "three/addons/": "https://esm.sh/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
 </head>
 
 <body>
   <div id="grain-overlay"></div>
   <div id="vignette-overlay"></div>
   <div id="loading">Loading...</div>
-  <div id="info">
-    AI Sat Mini &middot; Dawn-Dusk SSO<br>
-    Drag to orbit &middot; Scroll to zoom<br>
-    <span id="info-alt">1000 km</span> &middot; <span id="info-vel">7.35 km/s</span>
-  </div>
-  <div id="controls-ui">
-    <div id="altitude">
-      <label>Altitude</label>
-      <button data-alt="500">500 km</button>
-      <button data-alt="1000" class="active">1000 km</button>
-      <button data-alt="2000">2000 km</button>
-    </div>
-    <div id="speed">
-      <label>Time</label>
-      <button data-speed="1">1&times;</button>
-      <button data-speed="10" class="active">10&times;</button>
-      <button data-speed="100">100&times;</button>
-    </div>
-  </div>
+  <div id="progress-bar"></div>
+  <canvas id="c"></canvas>
+
+  <!-- Fixed title (appears after hero) -->
   <div id="title">
     <span class="its">It's</span>
     <span class="always">Always</span>
@@ -271,8 +430,126 @@
     <span class="in">in</span><span class="space">Space</span>
   </div>
 
-  <canvas id="c"></canvas>
+  <!-- Slide navigation dots -->
+  <div id="slide-dots"></div>
 
+  <!-- Nav arrows -->
+  <div id="nav-arrows">
+    <button class="nav-arrow disabled" id="nav-up">&#x25B2;</button>
+    <button class="nav-arrow" id="nav-down">&#x25BC;</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- Scroll Sections                                        -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <section class="scroll-section" id="section-0">
+    <div class="section-inner hero-align">
+      <div class="section-content transparent hero-title">
+        <span class="its">It's</span>
+        <span class="always">Always</span>
+        <span class="sunny">Sunny</span>
+        <span class="in">in</span><span class="space">Space</span>
+        <p>A deep dive into Elon's AI Sat Mini</p>
+        <div class="scroll-hint">↓ Scroll to explore</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scroll-section" id="section-1">
+    <div class="section-inner left">
+      <div class="section-content">
+        <span class="section-label">01 — Energy</span>
+        <h2>It's Always Sunny<br>in Space</h2>
+        <p>No atmosphere to filter the light, no clouds, no night. In orbit, solar power is continuous and abundant — the foundation for massive AI compute beyond Earth.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="scroll-section" id="section-2">
+    <div class="section-inner right">
+      <div class="section-content">
+        <span class="section-label">02 — Orbit</span>
+        <h2>Dawn-Dusk<br>Sun-Synchronous</h2>
+        <p>The satellite uses a Dawn-Dusk SSO — a specialized near-polar orbit where it travels along the terminator, the dividing line between day and night. It always sees the sun and never enters Earth's shadow.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="scroll-section" id="section-3">
+    <div class="section-inner left">
+      <div class="section-content">
+        <span class="section-label">03 — Altitude</span>
+        <h2>500 – 2,000 km<br>Above Earth</h2>
+        <p>A closer orbit means faster communication but more atmospheric drag. A wider orbit means less drag but higher launch cost. AI Sat Mini will orbit between 500 and 2,000 km — wider than Starlink's 550 km. At 1,000 km, it circles the planet every 105 minutes.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="scroll-section" id="section-4">
+    <div class="section-inner right">
+      <div class="section-content">
+        <span class="section-label">04 — Spacecraft</span>
+        <h2>170 Meters of<br>Orbital Datacenter</h2>
+        <p>Three major functions: compute, collect energy, and dissipate heat. Each unit weighs approximately 1 ton and provides 100 kW of power. This is just the "mini" version — future full-scale versions are expected to reach the megawatt.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="scroll-section" id="section-5">
+    <div class="section-inner left">
+      <div class="section-content">
+        <span class="section-label">05 — Power</span>
+        <h2>Solar Array</h2>
+        <p>Energy is plenty in space — no atmosphere filtering the light, and it's always sunny. Solar panels are multiple times more effective in orbit than on Earth. The panels maximize their surface area toward the sun for maximum energy capture.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="scroll-section" id="section-6">
+    <div class="section-inner right">
+      <div class="section-content">
+        <span class="section-label">06 — Compute</span>
+        <h2>Compute Core</h2>
+        <p>Specialized D3 chips optimized for high-temperature space environments and radiation resistance. Each unit delivers 100 kW of AI processing power in orbit.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="scroll-section" id="section-7">
+    <div class="section-inner left">
+      <div class="section-content">
+        <span class="section-label">07 — Thermal</span>
+        <h2>Radiators</h2>
+        <p>Dissipating heat is the real challenge. In a vacuum, there is no conduction or convection — only radiation. Each unit features a 100 m² radiator to reject heat into the void, while staying perpendicular to the sun and Earth to minimize heat absorption.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="scroll-section" id="section-8">
+    <div class="section-inner right">
+      <div class="section-content">
+        <span class="section-label">08 — The Mission</span>
+        <h2>Circling the<br>Terminator</h2>
+        <p>Thousands of AI Sat Mini units orbiting along the day-night boundary, forming a constellation of orbital datacenters powered by endless sunlight.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="scroll-section" id="section-9">
+    <div class="section-inner center">
+      <div class="section-content transparent">
+        <span class="section-label">AI Sat Mini</span>
+        <h2>Always Powered.<br>Always Computing.</h2>
+        <p>The AI Sat Mini is an incredible project, and the Terafab infrastructure needed to build it is even more so.</p>
+        <a href="explore.html" class="explore-link">Explore the Satellite →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- Three.js Module                                        -->
+  <!-- ═══════════════════════════════════════════════════════ -->
   <script type="module">
     import * as THREE from 'three';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -283,16 +560,16 @@
 
     // ── Constants (1 unit = 1 km) ────────────────────────────
     const EARTH_RADIUS = 6371;
-    const GM = 398600.4418; // km³/s² — standard gravitational parameter
-    let satAltitude = 1000;
-    let satDistance = EARTH_RADIUS + satAltitude;
-    const SUN_DIR = new THREE.Vector3(-1, 0, 0).normalize(); // perpendicular to polar orbit plane
+    const GM = 398600.4418;
+    const satAltitude = 1000;
+    const satDistance = EARTH_RADIUS + satAltitude;
+    const SUN_DIR = new THREE.Vector3(-1, 0, 0).normalize();
     const SUN_DIST = 500000;
 
     function orbitalVelocity(alt) { return Math.sqrt(GM / (EARTH_RADIUS + alt)); }
     function orbitalPeriod(alt) { const r = EARTH_RADIUS + alt; return 2 * Math.PI * r / orbitalVelocity(alt); }
 
-    // ── Atmosphere shader with Rayleigh-style scattering ─────
+    // ── Atmosphere shader ────────────────────────────────────
     const ATMOS_VS = `
       #include <common>
       #include <logdepthbuf_pars_vertex>
@@ -315,28 +592,18 @@
       void main() {
         vec3 viewDir = normalize(cameraPosition - vWorldPosition);
         vec3 normal = normalize(vWorldNormal);
-
-        // Fresnel rim
         float fresnel = pow(max(1.0 - dot(normal, viewDir), 0.0), 3.0);
-
-        // Sun illumination — atmosphere only glows on sunlit side
         float sunDot = dot(normal, uSunDir);
-        float sunMask = smoothstep(-0.15, 0.3, sunDot); // fade at terminator
+        float sunMask = smoothstep(-0.15, 0.3, sunDot);
         float sunGlow = pow(max(sunDot, 0.0), 2.0) * 0.6;
-
-        // Rayleigh-style color: blue at edges, warm near sun
         vec3 blueScatter = vec3(0.25, 0.55, 1.0);
         vec3 warmScatter = vec3(1.0, 0.7, 0.4);
         vec3 color = mix(blueScatter, warmScatter, sunGlow);
-
-        // Forward scattering (bright halo when looking toward sun through atmosphere)
         float viewSunDot = max(dot(-viewDir, uSunDir), 0.0);
         float forwardScatter = pow(viewSunDot, 8.0) * 0.5;
-
         float lit = fresnel * sunMask + forwardScatter;
         float alpha = lit * 0.85;
         vec3 finalColor = color * lit * uIntensity;
-
         gl_FragColor = vec4(finalColor, alpha);
         #include <logdepthbuf_fragment>
       }
@@ -346,23 +613,17 @@
     // AISatMini — orbital datacenter satellite
     // ══════════════════════════════════════════════════════════
     class AISatMini extends THREE.Group {
-      // Local frame:  X = radial,  Y = along-track,  Z = sun direction (-Z toward sun)
-      // Solar panels: perpendicular to sun (flat in X-Y)
-      // Core + radiators: parallel to sun rays (flat in X-Z, thin in Y)
-
-      static PANEL_SPAN = 0.085;   // 85 m each wing (170 m total)
-      static PANEL_DEPTH = 0.012;   // 12 m
-      static PANEL_THICK = 0.0003;  // 0.3 m
-      static PANEL_GAP = 0.008;   // 8 m between panels
-
-      static BUS_X = AISatMini.PANEL_DEPTH / 2; // 6 m — half panel width
-      static BUS_Y = 0.001;                      // 1 m thin
-      static BUS_Z = 0.015;                      // 15 m deep
-
-      static RAD_X = AISatMini.PANEL_DEPTH; // 12 m — full panel width
-      static RAD_Y = 0.0005;                // 0.5 m thin
-      static RAD_Z = 0.012;                 // 12 m deep each
-      static RAD_GAP = 0.001;               // 1 m between radiator panels
+      static PANEL_SPAN = 0.085;
+      static PANEL_DEPTH = 0.012;
+      static PANEL_THICK = 0.0003;
+      static PANEL_GAP = 0.008;
+      static BUS_X = AISatMini.PANEL_DEPTH / 2;
+      static BUS_Y = 0.001;
+      static BUS_Z = 0.015;
+      static RAD_X = AISatMini.PANEL_DEPTH;
+      static RAD_Y = 0.0005;
+      static RAD_Z = 0.012;
+      static RAD_GAP = 0.001;
 
       constructor() {
         super();
@@ -370,12 +631,10 @@
         this._buildSolarPanels();
         this._buildCore();
         this._buildRadiators();
-        this._buildLabels();
       }
 
       _buildMaterials() {
         this._solarTex = AISatMini._createSolarTexture();
-
         this.materials = {
           solarFront: new THREE.MeshStandardMaterial({
             map: this._solarTex, color: 0x555580,
@@ -405,7 +664,6 @@
         const SECTION_GAP = 0.0003;
         const sectionSpan = (PANEL_SPAN - (SECTIONS - 1) * SECTION_GAP) / SECTIONS;
         const geo = new THREE.BoxGeometry(PANEL_DEPTH, sectionSpan, PANEL_THICK);
-        // BoxGeometry faces: +X, -X, +Y, -Y, +Z (front), -Z (back)
         const { solarFront, solarBack } = this.materials;
         const panelMats = [solarBack, solarBack, solarBack, solarBack, solarFront, solarBack];
         for (const sign of [-1, 1]) {
@@ -417,7 +675,6 @@
             this.add(panel);
           }
         }
-        // Connecting beam along Y spanning both wings
         const totalSpan = 2 * (PANEL_SPAN + PANEL_GAP / 2);
         const beamGeo = new THREE.BoxGeometry(0.0002, totalSpan, 0.00016);
         const beam = new THREE.Mesh(beamGeo, this.materials.bus);
@@ -439,7 +696,6 @@
           panel.position.z = zStart - i * (RAD_Z + RAD_GAP);
           this.add(panel);
         }
-        // Connecting bar from center of core to center of outer radiator
         const lastRadCenter = zStart - (RAD_Z + RAD_GAP);
         const barLength = Math.abs(lastRadCenter);
         const barGeo = new THREE.BoxGeometry(0.0005, 0.0004, barLength);
@@ -448,109 +704,38 @@
         this.add(bar);
       }
 
-      _buildLabels() {
-        this.labels = [];
-        const createLabel = (text, pos, isRight) => {
-          const S = 1024; const H = 128;
-          const c = document.createElement('canvas');
-          c.width = S; c.height = H;
-          const ctx = c.getContext('2d');
-
-          const dotR = 8, lineW = 200, lineH = 2, textPad = 24;
-          const dotX = isRight ? 64 : S - 64;
-
-          ctx.fillStyle = 'rgba(255,255,255,0.7)';
-          ctx.font = '400 36px "Helvetica Neue", Arial, sans-serif';
-          ctx.textBaseline = 'middle';
-          ctx.shadowColor = 'rgba(0,0,0,0.5)';
-          ctx.shadowBlur = 8; ctx.shadowOffsetY = 2;
-
-          ctx.beginPath(); ctx.arc(dotX, H / 2, dotR, 0, Math.PI * 2); ctx.fill();
-
-          ctx.fillStyle = 'rgba(255,255,255,0.3)';
-          if (isRight) {
-            ctx.fillRect(dotX + dotR * 1.5, H / 2 - lineH / 2, lineW, lineH);
-            ctx.fillStyle = 'rgba(255,255,255,0.7)';
-            ctx.fillText(text.toUpperCase(), dotX + dotR * 1.5 + lineW + textPad, H / 2);
-          } else {
-            ctx.fillRect(dotX - dotR * 1.5 - lineW, H / 2 - lineH / 2, lineW, lineH);
-            ctx.fillStyle = 'rgba(255,255,255,0.7)';
-            const tw = ctx.measureText(text.toUpperCase()).width;
-            ctx.fillText(text.toUpperCase(), dotX - dotR * 1.5 - lineW - textPad - tw, H / 2);
-          }
-
-          const tex = new THREE.CanvasTexture(c);
-          tex.colorSpace = THREE.SRGBColorSpace;
-          tex.minFilter = THREE.LinearFilter;
-          const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0, depthTest: false });
-          const sprite = new THREE.Sprite(mat);
-          sprite.center.set(dotX / S, 0.5);
-          sprite.position.copy(pos);
-
-          const aspect = S / H;
-          sprite.scale.set(0.008 * aspect, 0.008, 1);
-          sprite.renderOrder = 10; // overlay on top
-
-          this.add(sprite);
-          this.labels.push(sprite);
-        };
-
-        createLabel('Solar Array', new THREE.Vector3(0, 0.045, 0), true);
-        createLabel('Compute Core', new THREE.Vector3(0.005, 0, 0.005), false);
-        createLabel('Radiators', new THREE.Vector3(0, 0, -0.015), true);
-      }
-
       static _createSolarTexture() {
         const S = 512;
         const c = document.createElement('canvas');
         c.width = S; c.height = S;
         const ctx = c.getContext('2d');
-
-        // Dark substrate (gaps between cells)
         ctx.fillStyle = '#0a0a1a';
         ctx.fillRect(0, 0, S, S);
-
         const cells = 12;
         const cellW = S / cells;
         const cellH = S / cells;
         const pad = 1.8;
         const rad = 3;
-
         for (let r = 0; r < cells; r++) {
           for (let col = 0; col < cells; col++) {
             const x = col * cellW + pad;
             const y = r * cellH + pad;
             const w = cellW - pad * 2;
             const h = cellH - pad * 2;
-
-            // Cell gradient — medium blue
             const v = Math.random() * 10;
             const grad = ctx.createLinearGradient(x, y, x + w * 0.3, y + h);
             grad.addColorStop(0, `rgb(${22 + v}, ${26 + v}, ${80 + v})`);
             grad.addColorStop(0.5, `rgb(${20 + v}, ${24 + v}, ${72 + v})`);
             grad.addColorStop(1, `rgb(${16 + v}, ${20 + v}, ${65 + v})`);
-
-            ctx.beginPath();
-            ctx.roundRect(x, y, w, h, rad);
-            ctx.fillStyle = grad;
-            ctx.fill();
-
-            // Subtle specular highlight
+            ctx.beginPath(); ctx.roundRect(x, y, w, h, rad); ctx.fillStyle = grad; ctx.fill();
             const hl = ctx.createRadialGradient(x + w * 0.35, y + h * 0.25, 0, x + w * 0.35, y + h * 0.25, w * 0.6);
             hl.addColorStop(0, 'rgba(130, 150, 220, 0.1)');
             hl.addColorStop(1, 'rgba(0, 0, 0, 0)');
-            ctx.beginPath();
-            ctx.roundRect(x, y, w, h, rad);
-            ctx.fillStyle = hl;
-            ctx.fill();
-
-            // Central vertical bus bar (silver)
+            ctx.beginPath(); ctx.roundRect(x, y, w, h, rad); ctx.fillStyle = hl; ctx.fill();
             const midX = x + w / 2;
             ctx.strokeStyle = 'rgba(180, 190, 210, 0.35)';
             ctx.lineWidth = 1.5;
             ctx.beginPath(); ctx.moveTo(midX, y + 3); ctx.lineTo(midX, y + h - 3); ctx.stroke();
-
-            // Horizontal finger electrodes
             ctx.strokeStyle = 'rgba(180, 190, 210, 0.15)';
             ctx.lineWidth = 0.6;
             const fingers = 8;
@@ -560,15 +745,12 @@
             }
           }
         }
-
-        // Interconnect wiring between rows
         ctx.strokeStyle = 'rgba(160, 170, 190, 0.3)';
         ctx.lineWidth = 2.5;
         for (let r = 1; r < cells; r++) {
           const ly = r * cellH;
           ctx.beginPath(); ctx.moveTo(0, ly); ctx.lineTo(S, ly); ctx.stroke();
         }
-
         const tex = new THREE.CanvasTexture(c);
         tex.colorSpace = THREE.SRGBColorSpace;
         tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
@@ -581,26 +763,17 @@
         const c = document.createElement('canvas');
         c.width = S; c.height = S;
         const ctx = c.getContext('2d');
-
-        // White/light grey base — radiators are white to radiate heat
         ctx.fillStyle = '#c8c8cc';
         ctx.fillRect(0, 0, S, S);
-
-        // Vertical heat pipe channels
         const pipes = 12;
         const pipeW = S / pipes;
         for (let i = 0; i < pipes; i++) {
           const x = i * pipeW;
-          // Pipe channel groove (darker stripe)
           ctx.fillStyle = `rgba(0, 0, 0, ${0.06 + Math.random() * 0.04})`;
           ctx.fillRect(x + pipeW * 0.1, 0, pipeW * 0.15, S);
-
-          // Pipe highlight (lighter stripe next to groove)
           ctx.fillStyle = `rgba(255, 255, 255, ${0.08 + Math.random() * 0.04})`;
           ctx.fillRect(x + pipeW * 0.3, 0, pipeW * 0.12, S);
         }
-
-        // Horizontal panel seams
         const seams = 4;
         ctx.strokeStyle = 'rgba(60, 60, 70, 0.4)';
         ctx.lineWidth = 1.5;
@@ -608,8 +781,6 @@
           const y = (i / seams) * S;
           ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(S, y); ctx.stroke();
         }
-
-        // Subtle edge darkening
         const edgeGrad = ctx.createLinearGradient(0, 0, S, 0);
         edgeGrad.addColorStop(0, 'rgba(0,0,0,0.06)');
         edgeGrad.addColorStop(0.1, 'rgba(0,0,0,0)');
@@ -617,7 +788,6 @@
         edgeGrad.addColorStop(1, 'rgba(0,0,0,0.06)');
         ctx.fillStyle = edgeGrad;
         ctx.fillRect(0, 0, S, S);
-
         const tex = new THREE.CanvasTexture(c);
         tex.colorSpace = THREE.SRGBColorSpace;
         tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
@@ -648,9 +818,7 @@
     composer.addPass(new RenderPass(scene, camera));
     const bloomPass = new UnrealBloomPass(
       new THREE.Vector2(window.innerWidth, window.innerHeight),
-      /* strength */ 0.28,
-      /* radius   */ 0.35,
-      /* threshold */ 0.82
+      0.28, 0.35, 0.82
     );
     composer.addPass(bloomPass);
     composer.addPass(new OutputPass());
@@ -658,106 +826,6 @@
     // ── Texture loading ──────────────────────────────────────
     const allTextures = [];
     const loadingManager = new THREE.LoadingManager();
-    loadingManager.onLoad = () => {
-      allTextures.forEach(t => renderer.initTexture(t));
-      renderer.compile(scene, camera);
-      renderer.render(scene, camera);
-      renderer.render(scene, camera);
-      setTimeout(() => {
-        document.getElementById('loading').style.display = 'none';
-
-
-
-        const clock = new THREE.Clock();
-        let totalTime = 0;
-        const _sunNDC = new THREE.Vector3();
-        const _screenCenter = new THREE.Vector2(0, 0);
-
-        (function animate() {
-          requestAnimationFrame(animate);
-          const dt = clock.getDelta();
-          totalTime += dt;
-
-          // Earth rotation (around Y axis)
-          earthMesh.rotation.y += EARTH_BASE * timeScale * dt;
-          cloudsMesh.rotation.y += EARTH_BASE * timeScale * dt * 1.05;
-
-          // Satellite orbit (rotate pivot around its local Z)
-          orbitPivot.rotation.z -= satBase * timeScale * dt;
-
-          // Fade orbit ring based on zoom distance
-          const camDist = camera.position.distanceTo(controls.target);
-          orbitMat.opacity = THREE.MathUtils.clamp((camDist - 5) / 500, 0, 0.08);
-
-          // Keep the camera following the satellite / Earth blend
-          // (see "Zoom target blending" comment block for full explanation)
-          const prevTarget = controls.target.clone();
-          satellite.getWorldPosition(satPos);
-
-          const blend = targetBlend(camDist);
-          const desiredTarget = satPos.clone().lerp(new THREE.Vector3(0, 0, 0), blend);
-
-          const delta = desiredTarget.clone().sub(prevTarget);
-          controls.target.copy(desiredTarget);
-          camera.position.add(delta);
-
-          controls.update();
-
-          // ── Twinkling stars ────────────────────────────────
-          starLayers.forEach((layer, i) => {
-            const twinkle = Math.sin(totalTime * (0.8 + i * 0.3) + layer.phase) * 0.12;
-            layer.points.material.opacity = THREE.MathUtils.clamp(layer.baseOpacity + twinkle, 0.1, 1.0);
-          });
-
-          // ── Lens flare update ──────────────────────────────
-          if (lensFlareSprites.length > 0) {
-            // Project sun to NDC
-            _sunNDC.copy(lensFlareSprites[0].sunPos);
-            _sunNDC.project(camera);
-            const sunVisible = _sunNDC.z < 1.0; // in front of camera
-            // Sun screen pos (-1..1)
-            const sx = _sunNDC.x, sy = _sunNDC.y;
-            // Angle from sun to screen center
-            const dx = _screenCenter.x - sx, dy = _screenCenter.y - sy;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            // Fade based on distance from screen center & whether sun is visible
-            const flareFade = sunVisible ? THREE.MathUtils.clamp(1.0 - dist * 0.5, 0, 1) : 0;
-
-            lensFlareSprites.forEach(({ sprite, t, sunPos }) => {
-              // Position along the vector from sun to center, extended beyond
-              const fx = sx + dx * t * 2.2;
-              const fy = sy + dy * t * 2.2;
-              // Unproject back to world space at the sun's depth
-              const worldPos = new THREE.Vector3(fx, fy, _sunNDC.z).unproject(camera);
-              sprite.position.copy(worldPos);
-              const baseAlpha = (0.03 + (1.0 - t) * 0.04) * flareFade;
-              sprite.material.opacity = baseAlpha;
-            });
-          }
-
-          // Update Labels
-          const fadeStart = 0.16;
-          const fadeFull = 0.22;
-          const fadeOutStart = 0.8;
-          const fadeOutEnd = 1.5;
-
-          let labelOpacity = 0;
-          if (camDist > fadeStart && camDist < fadeOutEnd) {
-            if (camDist < fadeFull) {
-              labelOpacity = (camDist - fadeStart) / (fadeFull - fadeStart);
-            } else if (camDist > fadeOutStart) {
-              labelOpacity = 1.0 - (camDist - fadeOutStart) / (fadeOutEnd - fadeOutStart);
-            } else {
-              labelOpacity = 1.0;
-            }
-          }
-
-          satellite.labels.forEach(s => { s.material.opacity = labelOpacity; });
-
-          composer.render();
-        })();
-      }, 100);
-    };
     const textureLoader = new THREE.TextureLoader(loadingManager);
     const loadTex = (url) => {
       const tex = textureLoader.load(url);
@@ -766,10 +834,9 @@
       return tex;
     };
 
-    // ── Starfield (enhanced — multi-layer with twinkling) ────
+    // ── Starfield ────────────────────────────────────────────
     const starLayers = [];
     {
-      // Layer 1: many small dim stars
       const N1 = 4000, pos1 = new Float32Array(N1 * 3), sz1 = new Float32Array(N1);
       for (let i = 0; i < N1; i++) {
         const θ = Math.random() * Math.PI * 2;
@@ -791,7 +858,6 @@
       scene.add(stars1);
       starLayers.push({ points: stars1, baseOpacity: 0.65, phase: Math.random() * Math.PI * 2 });
 
-      // Layer 2: fewer bright stars
       const N2 = 400, pos2 = new Float32Array(N2 * 3);
       for (let i = 0; i < N2; i++) {
         const θ = Math.random() * Math.PI * 2;
@@ -816,7 +882,6 @@
     const earthGroup = new THREE.Group();
     let earthMesh, cloudsMesh;
     {
-      // Surface
       const geo = new THREE.SphereGeometry(EARTH_RADIUS, 128, 64);
       earthMesh = new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({
         map: loadTex('textures/earth_daymap.jpg'),
@@ -830,7 +895,6 @@
       earthMesh.rotation.y = -1.2;
       earthGroup.add(earthMesh);
 
-      // Clouds
       cloudsMesh = new THREE.Mesh(
         new THREE.SphereGeometry(EARTH_RADIUS * 1.001, 96, 48),
         new THREE.MeshStandardMaterial({
@@ -841,15 +905,11 @@
       cloudsMesh.rotation.y = 0.5;
       earthGroup.add(cloudsMesh);
 
-      // Outer atmosphere (Rayleigh scattering)
       const atmos = new THREE.Mesh(
         new THREE.SphereGeometry(EARTH_RADIUS * 1.008, 64, 32),
         new THREE.ShaderMaterial({
           vertexShader: ATMOS_VS, fragmentShader: ATMOS_FS,
-          uniforms: {
-            uSunDir: { value: SUN_DIR.clone() },
-            uIntensity: { value: 1.4 },
-          },
+          uniforms: { uSunDir: { value: SUN_DIR.clone() }, uIntensity: { value: 1.4 } },
           side: THREE.BackSide, transparent: true,
           blending: THREE.AdditiveBlending, depthWrite: false,
         })
@@ -857,22 +917,17 @@
       atmos.renderOrder = 1;
       earthGroup.add(atmos);
 
-      // Inner atmosphere (tight rim glow)
       const innerAtmos = new THREE.Mesh(
         new THREE.SphereGeometry(EARTH_RADIUS * 1.003, 64, 32),
         new THREE.ShaderMaterial({
           vertexShader: ATMOS_VS, fragmentShader: ATMOS_FS,
-          uniforms: {
-            uSunDir: { value: SUN_DIR.clone() },
-            uIntensity: { value: 0.6 },
-          },
+          uniforms: { uSunDir: { value: SUN_DIR.clone() }, uIntensity: { value: 0.6 } },
           side: THREE.BackSide, transparent: true,
           blending: THREE.AdditiveBlending, depthWrite: false,
         })
       );
       innerAtmos.renderOrder = 1;
       earthGroup.add(innerAtmos);
-
       scene.add(earthGroup);
     }
 
@@ -880,12 +935,10 @@
     let lensFlareSprites = [];
     {
       const sunPos = SUN_DIR.clone().multiplyScalar(SUN_DIST);
-
       scene.add(new THREE.DirectionalLight(0xfff5e0, 3.5).translateX(sunPos.x).translateY(sunPos.y).translateZ(sunPos.z));
       scene.add(new THREE.AmbientLight(0xffffff, 0.04));
       scene.add(new THREE.HemisphereLight(0x8899aa, 0x111111, 0.08));
 
-      // ── Layered sun corona ────────────────────────────────
       function makeSunCanvas(size, stops) {
         const c = document.createElement('canvas');
         c.width = c.height = size;
@@ -897,18 +950,13 @@
       }
 
       const coronaTex = makeSunCanvas(512, [
-        [0, 'rgba(255,255,255,1)'],
-        [0.12, 'rgba(255,255,255,1)'],
-        [0.2, 'rgba(255,255,240,0.9)'],
-        [0.35, 'rgba(255,248,220,0.6)'],
-        [0.6, 'rgba(255,200,100,0.2)'],
-        [1, 'rgba(255,100,30,0)']
+        [0, 'rgba(255,255,255,1)'], [0.12, 'rgba(255,255,255,1)'],
+        [0.2, 'rgba(255,255,240,0.9)'], [0.35, 'rgba(255,248,220,0.6)'],
+        [0.6, 'rgba(255,200,100,0.2)'], [1, 'rgba(255,100,30,0)']
       ]);
       const glowTex = makeSunCanvas(256, [
-        [0, 'rgba(255,255,255,0.95)'],
-        [0.15, 'rgba(255,255,240,0.7)'],
-        [0.45, 'rgba(255,230,150,0.25)'],
-        [1, 'rgba(255,140,50,0)']
+        [0, 'rgba(255,255,255,0.95)'], [0.15, 'rgba(255,255,240,0.7)'],
+        [0.45, 'rgba(255,230,150,0.25)'], [1, 'rgba(255,140,50,0)']
       ]);
 
       const addSprite = (tex, pos, scale, order) => {
@@ -920,30 +968,21 @@
         scene.add(s); return s;
       };
 
-      addSprite(coronaTex, sunPos, 160000, 2);  // large outer corona
-      addSprite(glowTex, sunPos, 85000, 2);  // mid glow
-      addSprite(coronaTex, sunPos, 55000, 3);  // bright inner disk
-      addSprite(coronaTex, sunPos, 32000, 4);  // hot white core
-      addSprite(coronaTex, sunPos, 14000, 5);  // overexposed blinding centre
+      addSprite(coronaTex, sunPos, 160000, 2);
+      addSprite(glowTex, sunPos, 85000, 2);
+      addSprite(coronaTex, sunPos, 55000, 3);
+      addSprite(coronaTex, sunPos, 32000, 4);
+      addSprite(coronaTex, sunPos, 14000, 5);
 
-      // ── Lens flare ───────────────────────────────────────
-      // Flare elements are placed along the line from sun through screen center
       function makeFlareCanvas(size, color, shape = 'circle') {
         const c = document.createElement('canvas');
         c.width = c.height = size;
         const ctx = c.getContext('2d');
         if (shape === 'ring') {
-          ctx.strokeStyle = color;
-          ctx.lineWidth = size * 0.05;
-          ctx.globalAlpha = 0.6;
-          ctx.beginPath();
-          ctx.arc(size / 2, size / 2, size * 0.38, 0, Math.PI * 2);
-          ctx.stroke();
+          ctx.strokeStyle = color; ctx.lineWidth = size * 0.05; ctx.globalAlpha = 0.6;
+          ctx.beginPath(); ctx.arc(size / 2, size / 2, size * 0.38, 0, Math.PI * 2); ctx.stroke();
         } else if (shape === 'streak') {
-          // hexagonal "anamorphic" streak
-          ctx.strokeStyle = color;
-          ctx.lineWidth = size * 0.04;
-          ctx.globalAlpha = 0.5;
+          ctx.strokeStyle = color; ctx.lineWidth = size * 0.04; ctx.globalAlpha = 0.5;
           for (let i = 0; i < 6; i++) {
             const a = (i / 6) * Math.PI;
             const x1 = size / 2 + Math.cos(a) * size * 0.5;
@@ -972,7 +1011,6 @@
         { t: 1.0, scale: 16000, color: 'rgba(120,160,255,1)', shape: 'circle' },
         { t: 0.25, scale: 30000, color: 'rgba(255,245,200,1)', shape: 'streak' },
       ];
-
       flareElements.forEach(({ t, scale, color, shape }) => {
         const tex = makeFlareCanvas(256, color, shape);
         const s = new THREE.Sprite(new THREE.SpriteMaterial({
@@ -986,19 +1024,15 @@
       });
     }
 
-    // ── Orbit ring (faint) ────────────────────────────────────
+    // ── Orbit ring ───────────────────────────────────────────
     const orbitMat = new THREE.MeshBasicMaterial({
       color: 0x4488ff, transparent: true, opacity: 0.08,
       side: THREE.DoubleSide, depthWrite: false,
     });
-    function createOrbitRing() {
-      const ring = new THREE.Mesh(
-        new THREE.RingGeometry(satDistance - 2, satDistance + 2, 256, 1), orbitMat
-      );
-      ring.lookAt(SUN_DIR.clone().multiplyScalar(1000));
-      return ring;
-    }
-    let orbitRing = createOrbitRing();
+    const orbitRing = new THREE.Mesh(
+      new THREE.RingGeometry(satDistance - 40, satDistance + 40, 256, 1), orbitMat
+    );
+    orbitRing.lookAt(SUN_DIR.clone().multiplyScalar(1000));
     scene.add(orbitRing);
 
     // ── Satellite ────────────────────────────────────────────
@@ -1008,142 +1042,347 @@
 
     const satellite = new AISatMini();
     satellite.position.set(0, satDistance, 0);
-    // Orient: panels face sun (pivot's +Z), span tangent to orbit, radiator radial
     satellite.rotation.order = 'ZYX';
     satellite.rotation.z = Math.PI / 2;
     orbitPivot.add(satellite);
 
-    // ── Animation constants ─────────────────────────────────
-    let timeScale = 10;
-    const EARTH_BASE = 2 * Math.PI / 86400;
-    let satBase = 2 * Math.PI / orbitalPeriod(satAltitude);
+    // Get satellite world position (stable — no orbit animation in scroll mode)
+    const satWorldPos = new THREE.Vector3();
+    satellite.getWorldPosition(satWorldPos);
+    // satWorldPos ≈ (0, 7371, 0)
 
-    function setAltitude(alt) {
-      satAltitude = alt;
-      satDistance = EARTH_RADIUS + alt;
-      satBase = 2 * Math.PI / orbitalPeriod(alt);
-      satellite.position.set(0, satDistance, 0);
-      // Rebuild orbit ring
-      scene.remove(orbitRing);
-      orbitRing.geometry.dispose();
-      orbitRing = createOrbitRing();
-      scene.add(orbitRing);
-      // Update info
-      const vel = orbitalVelocity(alt);
-      document.getElementById('info-alt').textContent = alt + ' km';
-      document.getElementById('info-vel').textContent = vel.toFixed(2) + ' km/s';
+    // ══════════════════════════════════════════════════════════
+    // Camera Keyframes — scroll-driven cinematic journey
+    // ══════════════════════════════════════════════════════════
+    //
+    // Satellite at world (0, 7371, 0)
+    // Solar panels span ±Z, front faces -X (toward sun)
+    // Radiators extend in +X direction from satellite center
+    //
+    const KEYFRAMES = [
+      // 0: Hero — dramatic Earth from deep space
+      { pos: [12000, 18000, 28000], target: [0, 0, 0] },
+
+      // 1: Sun view — orbiting satellite, looking toward sun, Earth visible below
+      { pos: [15000, 8000, -6000], target: [0, 7371, 0] },
+
+      // 2: Orbit view — tighter, orbit ring visible, already aimed at orbit altitude
+      { pos: [9000, 14000, 10000], target: [0, 7371, 0] },
+
+      // 3: Approaching orbit altitude — pure zoom in
+      { pos: [150, 7500, 400], target: [0, 7371, 0] },
+
+      // 4: Satellite medium view — spacecraft visible
+      { pos: [-0.6, 7371.25, 0.8], target: [0, 7371, 0] },
+
+      // 5: Solar panels close-up — frontal view facing panel surface
+      { pos: [-0.14, 7371.04, 0.02], target: [0, 7371.01, 0] },
+
+      // 6: Compute core — from higher above
+      { pos: [0.02, 7371.06, 0.04], target: [0, 7371, 0] },
+
+      // 7: Radiators — from +X side (where radiators extend)
+      { pos: [0.055, 7371.008, 0.02], target: [0.02, 7371, 0] },
+
+      // 8: Pull-back — orbit overview, safe distance above Earth
+      { pos: [5000, 10000, 12000], target: [0, 7000, 0] },
+
+      // 9: Finale — epic pull-back to Earth
+      { pos: [-8000, 10000, 24000], target: [0, 0, 0] },
+    ];
+
+    // Convert arrays to Vector3 for convenience
+    const keyframesV3 = KEYFRAMES.map(kf => ({
+      pos: new THREE.Vector3(...kf.pos),
+      target: new THREE.Vector3(...kf.target),
+    }));
+
+    // ── Interpolation ────────────────────────────────────────
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     }
 
-    function initButtonGroup(selector, dataAttr, callback) {
-      document.querySelectorAll(`${selector} button`).forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelector(`${selector} .active`).classList.remove('active');
-          btn.classList.add('active');
-          callback(Number(btn.dataset[dataAttr]));
-        });
-      });
+    function interpolateCamera(kfA, kfB, t) {
+      t = easeInOutCubic(t);
+
+      // Interpolate target linearly
+      const target = new THREE.Vector3().lerpVectors(kfA.target, kfB.target, t);
+
+      // Compute offsets from respective targets
+      const offsetA = new THREE.Vector3().subVectors(kfA.pos, kfA.target);
+      const offsetB = new THREE.Vector3().subVectors(kfB.pos, kfB.target);
+      const distA = offsetA.length();
+      const distB = offsetB.length();
+      const dirA = offsetA.normalize();
+      const dirB = offsetB.normalize();
+
+      // Lerp direction (and normalize)
+      const dir = new THREE.Vector3().lerpVectors(dirA, dirB, t).normalize();
+
+      // Log-lerp distance for perceptually smooth zoom
+      const dist = Math.exp(THREE.MathUtils.lerp(Math.log(distA), Math.log(distB), t));
+
+      // Reconstruct camera position
+      const pos = target.clone().addScaledVector(dir, dist);
+      return { pos, target };
     }
 
-    initButtonGroup('#speed', 'speed', v => { timeScale = v; });
-    initButtonGroup('#altitude', 'alt', setAltitude);
-
-    // ── Camera & Controls ────────────────────────────────────
-    const satPos = new THREE.Vector3();
-    satellite.getWorldPosition(satPos);
-    camera.position.set(satPos.x - 0.0185, satPos.y + 0.0741, satPos.z + 0.1174);
-    camera.lookAt(satPos);
-
+    // ══════════════════════════════════════════════════════════
+    // OrbitControls — drag to orbit each view, returns to keyframe
+    // ══════════════════════════════════════════════════════════
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.copy(satPos);
-    controls.minDistance = 0.005;
-    controls.maxDistance = EARTH_RADIUS * 20;
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.rotateSpeed = 0.5;
     controls.enableZoom = false;
-    controls.update();
+    controls.enablePan = false;
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.rotateSpeed = 0.5;
 
-    // Expose for console debugging
-    Object.assign(window, { camera, controls, satellite, scene, THREE });
-
-    // ── Zoom target blending ──────────────────────────────────
-    // As the camera zooms out, the orbit-controls target smoothly
-    // shifts from the satellite to Earth's centre so the whole orbit
-    // stays nicely framed.
-    //
-    // How it works:
-    //   1. targetBlend(d) returns 0..1 based on camera-to-target distance.
-    //      Below BLEND_START the target is the satellite; above BLEND_END
-    //      it is Earth's centre; in between it's a smoothstep interpolation.
-    //   2. applyZoom() uses the blend to:
-    //        a) pick a dynamic minDistance so the camera never clips inside
-    //           Earth (lerps from 0.005 km near the sat to just above the
-    //           surface when centred on Earth),
-    //        b) recompute the target for the *new* zoom distance and place
-    //           the camera at the correct offset from it.
-    //   3. The animation loop applies the same blend every frame so the
-    //      target keeps tracking the satellite (when close) or stays
-    //      locked to Earth (when far) even as the satellite moves.
-    //
-    const BLEND_START = EARTH_RADIUS;       // begin shifting at 1× Earth radius
-    const BLEND_END   = EARTH_RADIUS * 10;  // fully centred on Earth at 10×
-    const SAT_MIN_DIST = 0.005;
-    const EARTH_MIN_DIST = EARTH_RADIUS * 1.015; // keep camera above the surface
-
-    function targetBlend(d) {
-      const t = THREE.MathUtils.clamp((d - BLEND_START) / (BLEND_END - BLEND_START), 0, 1);
-      return t * t * (3 - 2 * t); // smoothstep
+    // Helper: get keyframe camera state for a section
+    function getKeyframeCamera(i) {
+      return { pos: keyframesV3[i].pos.clone(), target: keyframesV3[i].target.clone() };
     }
 
-    function applyZoom(delta) {
-      const dist = camera.position.distanceTo(controls.target);
-      const factor = Math.max(dist * 0.16, 0.002);
-      const dir = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
-
-      // Min distance scales with the blend so we never go inside Earth
-      const blend = targetBlend(dist);
-      const minDist = THREE.MathUtils.lerp(SAT_MIN_DIST, EARTH_MIN_DIST, blend);
-
-      const newDist = THREE.MathUtils.clamp(
-        dist + delta * factor,
-        minDist, controls.maxDistance
-      );
-
-      // Recompute target for the new zoom level
-      const newBlend = targetBlend(newDist);
-      satellite.getWorldPosition(satPos);
-      const newTarget = satPos.clone().lerp(new THREE.Vector3(0, 0, 0), newBlend);
-
-      controls.target.copy(newTarget);
-      camera.position.copy(newTarget).addScaledVector(dir, newDist);
+    // Log-lerp tween between two camera states
+    function tweenCamera(fromPos, fromTarget, toPos, toTarget, t) {
+      const e = easeInOutCubic(t);
+      const target = new THREE.Vector3().lerpVectors(fromTarget, toTarget, e);
+      const oA = new THREE.Vector3().subVectors(fromPos, fromTarget);
+      const oB = new THREE.Vector3().subVectors(toPos, toTarget);
+      const dA = Math.max(oA.length(), 0.0001);
+      const dB = Math.max(oB.length(), 0.0001);
+      const dir = new THREE.Vector3().lerpVectors(oA.normalize(), oB.normalize(), e).normalize();
+      const dist = Math.exp(THREE.MathUtils.lerp(Math.log(dA), Math.log(dB), e));
+      return { pos: target.clone().addScaledVector(dir, dist), target };
     }
 
-    // Logarithmic zoom: slow when close, fast when far
-    renderer.domElement.addEventListener('wheel', (e) => {
+    // ══════════════════════════════════════════════════════════
+    // Slide navigation
+    // ══════════════════════════════════════════════════════════
+    const NUM_SECTIONS = KEYFRAMES.length;
+    let currentSection = 0;
+    let isAnimating = false;
+    let animStart = 0, animFromPos, animFromTarget, animToPos, animToTarget, animToIndex = 0;
+    const ANIM_DURATION = 1400;
+    let lastAnimEnd = 0;
+    const COOLDOWN = 600;
+
+    // Return-to-keyframe after orbiting
+    let isReturning = false;
+    let retStart = 0, retFromPos, retFromTarget, retToPos, retToTarget;
+    const RET_DURATION = 1000;
+    let retTimeout = null;
+    const RET_DELAY = 1800;
+
+    controls.addEventListener('start', () => {
+      isReturning = false;
+      clearTimeout(retTimeout);
+    });
+    controls.addEventListener('end', () => {
+      clearTimeout(retTimeout);
+      retTimeout = setTimeout(() => {
+        if (isAnimating) return;
+        const kf = getKeyframeCamera(currentSection);
+        retFromPos = camera.position.clone();
+        retFromTarget = controls.target.clone();
+        retToPos = kf.pos;
+        retToTarget = kf.target;
+        if (retFromPos.distanceTo(retToPos) < 0.0001) return;
+        retStart = performance.now();
+        isReturning = true;
+      }, RET_DELAY);
+    });
+
+    const progressBar = document.getElementById('progress-bar');
+    const titleEl = document.getElementById('title');
+    const sectionContents = document.querySelectorAll('.section-content');
+
+    // Build dots
+    const dotsContainer = document.getElementById('slide-dots');
+    for (let i = 0; i < NUM_SECTIONS; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'slide-dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', () => goToSection(i));
+      dotsContainer.appendChild(dot);
+    }
+    const dots = dotsContainer.querySelectorAll('.slide-dot');
+
+    // Build arrows inside dots container: up arrow → dots → down arrow
+    const navUp = document.createElement('button');
+    navUp.className = 'dot-arrow disabled';
+    navUp.innerHTML = '&#x25B2;';
+    navUp.addEventListener('click', () => goToSection(currentSection - 1));
+    dotsContainer.insertBefore(navUp, dotsContainer.firstChild);
+
+    const navDown = document.createElement('button');
+    navDown.className = 'dot-arrow';
+    navDown.innerHTML = '&#x25BC;';
+    navDown.addEventListener('click', () => goToSection(currentSection + 1));
+    dotsContainer.appendChild(navDown);
+
+    function updateUI(section) {
+      sectionContents.forEach((el, i) => el.classList.toggle('visible', i === section));
+      dots.forEach((d, i) => d.classList.toggle('active', i === section));
+      titleEl.classList.toggle('visible', section > 0);
+      progressBar.style.height = `${(section / (NUM_SECTIONS - 1)) * 100}%`;
+      navUp.classList.toggle('disabled', section === 0);
+      navDown.classList.toggle('disabled', section === NUM_SECTIONS - 1);
+    }
+
+    function goToSection(index) {
+      index = Math.max(0, Math.min(index, NUM_SECTIONS - 1));
+      if (isAnimating || index === currentSection) return;
+
+      isReturning = false;
+      clearTimeout(retTimeout);
+
+      // Tween from current camera (might be orbited) to target keyframe
+      animFromPos = camera.position.clone();
+      animFromTarget = controls.target.clone();
+      const kf = getKeyframeCamera(index);
+      animToPos = kf.pos;
+      animToTarget = kf.target;
+      animToIndex = index;
+
+      sectionContents[currentSection]?.classList.remove('visible');
+      animStart = performance.now();
+      isAnimating = true;
+      controls.enabled = false;
+
+      setTimeout(() => {
+        sectionContents[index]?.classList.add('visible');
+        dots.forEach((d, i) => d.classList.toggle('active', i === index));
+        titleEl.classList.toggle('visible', index > 0);
+        progressBar.style.height = `${(index / (NUM_SECTIONS - 1)) * 100}%`;
+        navUp.classList.toggle('disabled', index === 0);
+        navDown.classList.toggle('disabled', index === NUM_SECTIONS - 1);
+      }, ANIM_DURATION * 0.35);
+    }
+
+    // Wheel
+    window.addEventListener('wheel', (e) => {
       e.preventDefault();
-      applyZoom(e.deltaY > 0 ? 1 : -1);
+      if (isAnimating || isReturning) return;
+      if (performance.now() - lastAnimEnd < COOLDOWN) return;
+      if (Math.abs(e.deltaY) < 2) return;
+      goToSection(currentSection + (e.deltaY > 0 ? 1 : -1));
     }, { passive: false });
 
-    // Pinch zoom on mobile (logarithmic, matching scroll zoom)
-    let prevPinchDist = 0;
-    renderer.domElement.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 2) {
-        const dx = e.touches[0].clientX - e.touches[1].clientX;
-        const dy = e.touches[0].clientY - e.touches[1].clientY;
-        prevPinchDist = Math.sqrt(dx * dx + dy * dy);
-      }
+    // Touch swipe
+    let touchStartY = 0;
+    window.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; }, { passive: true });
+    window.addEventListener('touchend', (e) => {
+      const dy = touchStartY - e.changedTouches[0].clientY;
+      if (Math.abs(dy) < 40 || isAnimating || isReturning) return;
+      if (performance.now() - lastAnimEnd < COOLDOWN) return;
+      goToSection(currentSection + (dy > 0 ? 1 : -1));
     }, { passive: true });
-    renderer.domElement.addEventListener('touchmove', (e) => {
-      if (e.touches.length === 2) {
-        e.preventDefault();
-        const dx = e.touches[0].clientX - e.touches[1].clientX;
-        const dy = e.touches[0].clientY - e.touches[1].clientY;
-        const pinchDist = Math.sqrt(dx * dx + dy * dy);
-        const delta = prevPinchDist - pinchDist;
-        prevPinchDist = pinchDist;
-        applyZoom(delta * 0.0375);
+
+    // Keyboard
+    window.addEventListener('keydown', (e) => {
+      if (isAnimating) return;
+      if (e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault(); goToSection(currentSection + 1);
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        e.preventDefault(); goToSection(currentSection - 1);
       }
-    }, { passive: false });
+    });
+
+    updateUI(0);
+
+    // ══════════════════════════════════════════════════════════
+    // Animation loop
+    // ══════════════════════════════════════════════════════════
+    const EARTH_BASE = 2 * Math.PI / 86400;
+
+    loadingManager.onLoad = () => {
+      allTextures.forEach(t => renderer.initTexture(t));
+      renderer.compile(scene, camera);
+
+      // Set initial camera & controls
+      const kf0 = getKeyframeCamera(0);
+      camera.position.copy(kf0.pos);
+      camera.lookAt(kf0.target);
+      controls.target.copy(kf0.target);
+      controls.update();
+      renderer.render(scene, camera);
+
+      setTimeout(() => {
+        document.getElementById('loading').classList.add('hidden');
+      }, 100);
+
+      const clock = new THREE.Clock();
+      let totalTime = 0;
+      const _sunNDC = new THREE.Vector3();
+      const _screenCenter = new THREE.Vector2(0, 0);
+
+      (function animate() {
+        requestAnimationFrame(animate);
+        const dt = clock.getDelta();
+        totalTime += dt;
+
+        earthMesh.rotation.y += EARTH_BASE * 10 * dt;
+        cloudsMesh.rotation.y += EARTH_BASE * 10 * dt * 1.05;
+
+        // ── Slide transition ───────────────────────────────
+        if (isAnimating) {
+          const t = Math.min((performance.now() - animStart) / ANIM_DURATION, 1);
+          const { pos, target } = tweenCamera(animFromPos, animFromTarget, animToPos, animToTarget, t);
+          camera.position.copy(pos);
+          camera.lookAt(target);
+          controls.target.copy(target);
+          if (t >= 1) {
+            currentSection = animToIndex;
+            isAnimating = false;
+            lastAnimEnd = performance.now();
+            controls.enabled = true;
+          }
+        }
+        // ── Return to keyframe after orbiting ──────────────
+        else if (isReturning) {
+          const t = Math.min((performance.now() - retStart) / RET_DURATION, 1);
+          const { pos, target } = tweenCamera(retFromPos, retFromTarget, retToPos, retToTarget, t);
+          camera.position.copy(pos);
+          camera.lookAt(target);
+          controls.target.copy(target);
+          if (t >= 1) isReturning = false;
+        }
+        // ── Free orbit (user can drag) ─────────────────────
+        else {
+          controls.update();
+        }
+
+        // Orbit ring opacity
+        const camDist = camera.position.distanceTo(controls.target);
+        orbitMat.opacity = THREE.MathUtils.clamp((camDist - 5) / 300, 0, 0.25);
+
+        // Twinkling stars
+        starLayers.forEach((layer, i) => {
+          const twinkle = Math.sin(totalTime * (0.8 + i * 0.3) + layer.phase) * 0.12;
+          layer.points.material.opacity = THREE.MathUtils.clamp(layer.baseOpacity + twinkle, 0.1, 1.0);
+        });
+
+        // Lens flare
+        if (lensFlareSprites.length > 0) {
+          _sunNDC.copy(lensFlareSprites[0].sunPos);
+          _sunNDC.project(camera);
+          const sunVisible = _sunNDC.z < 1.0;
+          const sx = _sunNDC.x, sy = _sunNDC.y;
+          const dx = _screenCenter.x - sx, dy = _screenCenter.y - sy;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const flareFade = sunVisible ? THREE.MathUtils.clamp(1.0 - dist * 0.5, 0, 1) : 0;
+
+          lensFlareSprites.forEach(({ sprite, t, sunPos }) => {
+            const fx = sx + dx * t * 2.2;
+            const fy = sy + dy * t * 2.2;
+            const worldPos = new THREE.Vector3(fx, fy, _sunNDC.z).unproject(camera);
+            sprite.position.copy(worldPos);
+            sprite.material.opacity = (0.03 + (1.0 - t) * 0.04) * flareFade;
+          });
+        }
+
+        composer.render();
+      })();
+    };
 
     // ── Resize ───────────────────────────────────────────────
     addEventListener('resize', () => {
