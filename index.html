@@ -287,34 +287,62 @@
 
     /* ── Responsive ────────────────────────────────────────── */
     @media (max-width: 768px) {
+      /* All sections: bottom-aligned, left-justified, safe padding */
       .section-inner {
-        padding: 0 6vw;
+        padding: 0 5vw;
+        padding-bottom: 10vh;
+        padding-right: 40px; /* clear dots */
         align-items: flex-end;
-        padding-bottom: 12vh;
-      }
-      .section-inner.center {
-        align-items: center;
-        padding-bottom: 0;
       }
       .section-inner.left,
       .section-inner.right {
         justify-content: flex-start;
       }
+
+      /* Hero: centered on mobile */
+      .section-inner.hero-align {
+        justify-content: center;
+        align-items: center;
+        padding-bottom: 0;
+        padding-right: 5vw;
+      }
+      .hero-title { text-align: center; }
+      .hero-title p { text-align: center; }
+      .hero-title .always, .hero-title .sunny, .hero-title .space { font-size: 38px; letter-spacing: 2px; }
+      .hero-title .its, .hero-title .in { font-size: 14px; }
+
+      /* Finale: centered */
+      .section-inner.center {
+        justify-content: center;
+        align-items: center;
+        padding-bottom: 0;
+        padding-right: 5vw;
+      }
+
+      /* Cards */
       .section-content {
         max-width: 100%;
-        padding: 24px 28px;
+        padding: 20px 24px;
       }
-      .section-content h1 { font-size: 42px; }
-      .section-content h2 { font-size: 30px; }
-      .section-content p { font-size: 14px; }
-      .section-label { font-size: 10px; }
-      #title .always, #title .sunny, #title .space { font-size: 24px; }
-      #title .its, #title .in { font-size: 12px; }
-      #title { top: 12px; right: 16px; }
-      .hero-title .always, .hero-title .sunny, .hero-title .space { font-size: 42px; }
-      .hero-title .its, .hero-title .in { font-size: 16px; }
-      #slide-dots { right: 12px; gap: 10px; }
+      .section-content.transparent { max-width: 100%; }
+      .section-content h2 { font-size: 26px; }
+      .section-content p { font-size: 13px; line-height: 1.6; }
+      .section-label { font-size: 9px; letter-spacing: 2px; margin-bottom: 10px; }
+
+      /* Fixed title */
+      #title { top: 10px; right: 14px; }
+      #title .always, #title .sunny, #title .space { font-size: 20px; letter-spacing: 1px; }
+      #title .its, #title .in { font-size: 10px; }
+
+      /* Dots */
+      #slide-dots { right: 10px; gap: 8px; }
       .slide-dot { width: 6px; height: 6px; }
+
+      /* Explore link */
+      .explore-link { padding: 12px 24px; font-size: 12px; }
+
+      /* Scroll hint */
+      .scroll-hint { font-size: 10px; margin-top: 28px; }
     }
   </style>
 
