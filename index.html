@@ -131,7 +131,7 @@
       text-align: center;
     }
 
-    /* ── Slide dots (navigation indicator) ─────────────────── */
+    /* ── Slide dots + arrows (navigation) ────────────────── */
     #slide-dots {
       position: fixed;
       right: 24px;
@@ -140,7 +140,8 @@
       z-index: 10;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      align-items: center;
+      gap: 10px;
       pointer-events: auto;
     }
     .slide-dot {
@@ -157,15 +158,37 @@
       border-color: rgba(255, 255, 255, 0.9);
       transform: scale(1.3);
     }
+    .dot-arrow {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.2);
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .dot-arrow:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.7);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .dot-arrow:active { transform: scale(0.9); }
+    .dot-arrow.disabled { opacity: 0.15; pointer-events: none; }
 
     /* ── Section content cards ─────────────────────────────── */
     .section-content {
       max-width: 460px;
       padding: 36px 40px;
-      background: rgba(0, 0, 0, 0.35);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(0, 0, 0, 0.18);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.04);
       border-radius: 6px;
       opacity: 0;
       transform: translateY(40px);
@@ -231,6 +254,40 @@
       text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
     }
 
+    /* ── Nav arrows ──────────────────────────────────────── */
+    #nav-arrows {
+      display: none; /* replaced by integrated dot arrows */
+    }
+    .nav-arrow {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-arrow:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.7);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .nav-arrow:active {
+      transform: scale(0.9);
+    }
+    .nav-arrow.disabled {
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
     /* ── Explore link ─────────────────────────────────────── */
     .explore-link {
       display: inline-block;
@@ -287,16 +344,24 @@
 
     /* ── Responsive ────────────────────────────────────────── */
     @media (max-width: 768px) {
-      /* All sections: bottom-aligned, left-justified, safe padding */
+      /* All sections: cards at bottom, 3D visible above */
       .section-inner {
-        padding: 0 5vw;
-        padding-bottom: 10vh;
+        padding: 0 5vw 24px 5vw;
         padding-right: 40px; /* clear dots */
         align-items: flex-end;
       }
       .section-inner.left,
       .section-inner.right {
         justify-content: flex-start;
+      }
+
+      /* Cards: compact at bottom */
+      .section-content {
+        max-width: 100%;
+        padding: 16px 20px;
+      }
+      .section-content.transparent {
+        max-width: 100%;
       }
 
       /* Hero: centered on mobile */
@@ -318,13 +383,6 @@
         padding-bottom: 0;
         padding-right: 5vw;
       }
-
-      /* Cards */
-      .section-content {
-        max-width: 100%;
-        padding: 20px 24px;
-      }
-      .section-content.transparent { max-width: 100%; }
       .section-content h2 { font-size: 26px; }
       .section-content p { font-size: 13px; line-height: 1.6; }
       .section-label { font-size: 9px; letter-spacing: 2px; margin-bottom: 10px; }
@@ -334,9 +392,10 @@
       #title .always, #title .sunny, #title .space { font-size: 20px; letter-spacing: 1px; }
       #title .its, #title .in { font-size: 10px; }
 
-      /* Dots */
-      #slide-dots { right: 10px; gap: 8px; }
+      /* Dots + arrows */
+      #slide-dots { right: 10px; gap: 7px; }
       .slide-dot { width: 6px; height: 6px; }
+      .dot-arrow { width: 24px; height: 24px; font-size: 8px; }
 
       /* Explore link */
       .explore-link { padding: 12px 24px; font-size: 12px; }
@@ -373,6 +432,12 @@
 
   <!-- Slide navigation dots -->
   <div id="slide-dots"></div>
+
+  <!-- Nav arrows -->
+  <div id="nav-arrows">
+    <button class="nav-arrow disabled" id="nav-up">&#x25B2;</button>
+    <button class="nav-arrow" id="nav-down">&#x25BC;</button>
+  </div>
 
   <!-- ═══════════════════════════════════════════════════════ -->
   <!-- Scroll Sections                                        -->
@@ -1141,11 +1206,26 @@
     }
     const dots = dotsContainer.querySelectorAll('.slide-dot');
 
+    // Build arrows inside dots container: up arrow → dots → down arrow
+    const navUp = document.createElement('button');
+    navUp.className = 'dot-arrow disabled';
+    navUp.innerHTML = '&#x25B2;';
+    navUp.addEventListener('click', () => goToSection(currentSection - 1));
+    dotsContainer.insertBefore(navUp, dotsContainer.firstChild);
+
+    const navDown = document.createElement('button');
+    navDown.className = 'dot-arrow';
+    navDown.innerHTML = '&#x25BC;';
+    navDown.addEventListener('click', () => goToSection(currentSection + 1));
+    dotsContainer.appendChild(navDown);
+
     function updateUI(section) {
       sectionContents.forEach((el, i) => el.classList.toggle('visible', i === section));
       dots.forEach((d, i) => d.classList.toggle('active', i === section));
       titleEl.classList.toggle('visible', section > 0);
       progressBar.style.height = `${(section / (NUM_SECTIONS - 1)) * 100}%`;
+      navUp.classList.toggle('disabled', section === 0);
+      navDown.classList.toggle('disabled', section === NUM_SECTIONS - 1);
     }
 
     function goToSection(index) {
@@ -1173,6 +1253,8 @@
         dots.forEach((d, i) => d.classList.toggle('active', i === index));
         titleEl.classList.toggle('visible', index > 0);
         progressBar.style.height = `${(index / (NUM_SECTIONS - 1)) * 100}%`;
+        navUp.classList.toggle('disabled', index === 0);
+        navDown.classList.toggle('disabled', index === NUM_SECTIONS - 1);
       }, ANIM_DURATION * 0.35);
     }
 
